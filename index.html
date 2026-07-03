@@ -94,19 +94,26 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
     <li><a href="#">Contact</a></li>
   </ul>
 
-  <div class="nav-actions">
-    <button aria-label="Search">🔍</button>
-    <button aria-label="Account">👤</button>
-    <button aria-label="Cart" id="cartBtn" style="position:relative;">
-      🛒<span class="cart-badge" id="cartCount">0</span>
-    </button>
-    <button aria-label="Menu" id="hamburgerBtn" class="hamburger-btn">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </div>
+ <div class="nav-actions">
+  <button aria-label="Search" id="searchBtn">🔍</button>
+  <button aria-label="Account" id="accountBtn">👤</button>
+  <button aria-label="Cart" id="cartBtn" style="position:relative;">
+    🛒<span class="cart-badge" id="cartCount">0</span>
+  </button>
+  <button aria-label="Menu" id="hamburgerBtn" class="hamburger-btn">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</div>
 </nav>
+
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search for nuts, butter, brittles…" autocomplete="off" />
+    <button id="searchCloseBtn" aria-label="Close search">✕</button>
+  </div>
+</div>
 
 <!-- ── MOBILE DROPDOWN MENU ── -->
 <div class="mobile-menu" id="mobileMenu">

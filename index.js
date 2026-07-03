@@ -117,3 +117,62 @@ window.addEventListener('scroll', () => {
 backToTopBtn.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+
+/* ── SEARCH ── */
+const searchOverlay = document.getElementById('searchOverlay');
+const searchInput   = document.getElementById('searchInput');
+
+document.getElementById('searchBtn').addEventListener('click', () => {
+  searchOverlay.classList.add('open');
+  setTimeout(() => searchInput.focus(), 100);
+});
+document.getElementById('searchCloseBtn').addEventListener('click', closeSearch);
+searchOverlay.addEventListener('click', (e) => {
+  if (e.target === searchOverlay) closeSearch();
+});
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && searchInput.value.trim()) {
+    showToast(`Searching for "${searchInput.value.trim()}"…`);
+    closeSearch();
+  }
+  if (e.key === 'Escape') closeSearch();
+});
+function closeSearch() {
+  searchOverlay.classList.remove('open');
+  searchInput.value = '';
+}
+
+/* ── ACCOUNT ── */
+document.getElementById('accountBtn').addEventListener('click', () => {
+  showToast('Account & login coming soon 👤');
+});
+
+/* ── NAV LINKS: smooth scroll to matching sections ── */
+const navTargets = {
+  'Home': null, // scrolls to top
+  'Shop': '.two-col',
+  'Categories': '.categories-grid',
+  'Contact': 'footer',
+};
+
+document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const label = link.textContent.trim();
+
+    // close mobile menu if open
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('hamburgerBtn').classList.remove('active');
+
+    if (label === 'Home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const selector = navTargets[label];
+    if (selector) {
+      document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      showToast(`${label} page coming soon`);
+    }
+  });
+});
