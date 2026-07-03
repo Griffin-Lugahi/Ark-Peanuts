@@ -148,31 +148,35 @@ document.getElementById('accountBtn').addEventListener('click', () => {
 });
 
 /* ── NAV LINKS: smooth scroll to matching sections ── */
-const navTargets = {
-  'Home': null, // scrolls to top
-  'Shop': '.two-col',
-  'Categories': '.categories-grid',
-  'Contact': 'footer',
-};
-
+// All nav links now point to real in-page anchors (e.g. #about, #contact),
+// so we just intercept the click to close the mobile menu and do a smooth scroll.
 document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(link => {
   link.addEventListener('click', (e) => {
+    const href = link.getAttribute('href') || '';
+    if (!href.startsWith('#') || href.length <= 1) return; // let plain "#" links do nothing special
+
     e.preventDefault();
-    const label = link.textContent.trim();
 
     // close mobile menu if open
     document.getElementById('mobileMenu').classList.remove('open');
     document.getElementById('hamburgerBtn').classList.remove('active');
 
-    if (label === 'Home') {
+    const targetId = href.slice(1);
+    if (targetId === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    const selector = navTargets[label];
-    if (selector) {
-      document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      showToast(`${label} page coming soon`);
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
 });
+
+/* ── CONTACT FORM ── */
+function submitContactForm(e) {
+  e.preventDefault();
+  const name = document.getElementById('contactName').value.trim();
+  document.getElementById('contactName').closest('form').reset();
+  showToast(name ? `Thanks ${name}, we'll be in touch! 🥜` : 'Message sent, thank you!');
+}
