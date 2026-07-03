@@ -85,13 +85,13 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
   </a>
 
   <ul class="nav-links">
-    <li><a href="#">Home</a></li>
-    <li><a href="#">Shop</a></li>
-    <li><a href="#" class="has-drop">Categories</a></li>
-    <li><a href="#">About Us</a></li>
-    <li><a href="#">Health Benefits</a></li>
-    <li><a href="#">Bulk Orders</a></li>
-    <li><a href="#">Contact</a></li>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#categories" class="has-drop">Categories</a></li>
+    <li><a href="#about">About Us</a></li>
+    <li><a href="#benefits">Health Benefits</a></li>
+    <li><a href="#bulk">Bulk Orders</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
 
  <div class="nav-actions">
@@ -118,23 +118,23 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 <!-- ── MOBILE DROPDOWN MENU ── -->
 <div class="mobile-menu" id="mobileMenu">
   <ul>
-    <li><a href="#">Home</a></li>
-    <li><a href="#">Shop</a></li>
-    <li><a href="#" class="has-drop">Categories</a></li>
-    <li><a href="#">About Us</a></li>
-    <li><a href="#">Health Benefits</a></li>
-    <li><a href="#">Bulk Orders</a></li>
-    <li><a href="#">Contact</a></li>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#categories" class="has-drop">Categories</a></li>
+    <li><a href="#about">About Us</a></li>
+    <li><a href="#benefits">Health Benefits</a></li>
+    <li><a href="#bulk">Bulk Orders</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
 </div>
 
 <!-- ── HERO ── -->
-<section class="hero">
+<section class="hero" id="home">
   <div class="hero-left">
     <p class="hero-eyebrow">Premium Quality</p>
     <h1 class="hero-title">All-natural<br>addictive-free</h1>
     <p class="hero-sub">Carefully sourced from trusted farms and packed with goodness, a perfect snack for a healthy life.</p>
-    <a href="#" class="btn-primary">SHOP NOW →</a>
+    <a href="#shop" class="btn-primary">SHOP NOW →</a>
     <div class="hero-badges">
       <div class="hero-badge">
         <span style="font-size:1.3rem;color:var(--gold);">🌿</span>
@@ -160,10 +160,10 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 
 <!-- ── SHOP BY CATEGORY + BEST SELLERS ── -->
-<div class="two-col">
+<div class="two-col" id="shop">
 
   <!-- Categories -->
-  <div>
+  <div id="categories">
     <div class="section-header">
       <h2 class="section-title">Shop by Category</h2>
       <a href="#" class="view-all">View all →</a>
@@ -257,6 +257,48 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 </div>
 
+<!-- ── ABOUT US ── -->
+<section class="about-section" id="about">
+  <div class="about-grid">
+    <div class="about-image">
+      <img src="logo/Arkpeanuts-hero-section-img.png" alt="Ark Peanuts farm sourcing" />
+      <div class="about-badge">
+        <strong>10+</strong>
+        <span>Years Roasting</span>
+      </div>
+    </div>
+    <div class="about-content">
+      <p class="hero-eyebrow">Our Story</p>
+      <h2 class="section-title">About Ark Peanuts</h2>
+      <p class="about-text">
+        Ark Peanuts started with a simple idea: snacks should taste like where they came from. We partner directly
+        with smallholder farmers across Kenya, paying fair prices for every harvest and hand-selecting only the
+        best nuts to roast.
+      </p>
+      <p class="about-text">
+        Every jar and packet is small-batch roasted, free from preservatives, added oils, and hidden sugar — just
+        the way nature intended. What started as a family kitchen project has grown into a brand trusted by
+        thousands of households across the country, without losing the care that built it.
+      </p>
+      <div class="about-stats">
+        <div class="about-stat">
+          <strong>2,400+</strong>
+          <span>Happy Customers</span>
+        </div>
+        <div class="about-stat">
+          <strong>500+</strong>
+          <span>Partner Farms</span>
+        </div>
+        <div class="about-stat">
+          <strong>100%</strong>
+          <span>Natural Ingredients</span>
+        </div>
+      </div>
+      <a href="#contact" class="btn-primary about-btn">GET IN TOUCH →</a>
+    </div>
+  </div>
+</section>
+
 <!-- ── WHY CHOOSE US ── -->
 <section class="why-section">
   <div class="section-header">
@@ -289,7 +331,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 </section>
 
 <!-- ── PRODUCT BENEFITS ── -->
-<section class="benefits-section">
+<section class="benefits-section" id="benefits">
   <div class="benefits-intro">
     <p class="hero-eyebrow">Good For You</p>
     <h2 class="section-title benefits-title">Product Benefits</h2>
@@ -315,6 +357,41 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
       <div class="benefit-stat">0g</div>
       <div class="benefit-label">Added Sugar</div>
       <p>Naturally sweet and satisfying, with nothing artificial added.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── BULK ORDERS ── -->
+<section class="bulk-section" id="bulk">
+  <div class="bulk-content">
+    <p class="hero-eyebrow">For Businesses & Events</p>
+    <h2 class="section-title bulk-title">Bulk Orders</h2>
+    <p class="bulk-text">
+      Planning a corporate gift, wedding favour, or office pantry restock? We offer bulk pricing on all our nuts,
+      butters, and brittles, with reliable delivery across Kenya and custom packaging on request.
+    </p>
+    <div class="bulk-actions">
+      <a
+        href="https://wa.me/254700000000?text=Hi%2C%20I'd%20like%20to%20place%20a%20bulk%20order"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-primary"
+      >CHAT ON WHATSAPP →</a>
+      <a href="#contact" class="btn-outline">Send an Enquiry</a>
+    </div>
+  </div>
+  <div class="bulk-perks">
+    <div class="bulk-perk">
+      <span>📦</span>
+      <div><strong>Custom Quantities</strong><p>From 5kg to 500kg+, tailored to your event or office.</p></div>
+    </div>
+    <div class="bulk-perk">
+      <span>🏷️</span>
+      <div><strong>Volume Pricing</strong><p>Better rates the more you order, with invoicing available.</p></div>
+    </div>
+    <div class="bulk-perk">
+      <span>🚚</span>
+      <div><strong>Nationwide Delivery</strong><p>Scheduled drop-offs across Kenya, on your timeline.</p></div>
     </div>
   </div>
 </section>
@@ -380,6 +457,55 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
   </div>
 </section>
 
+<!-- ── CONTACT ── -->
+<section class="contact-section" id="contact">
+  <div class="section-header">
+    <h2 class="section-title">Get In Touch</h2>
+  </div>
+  <p class="why-sub">Questions about an order, wholesale, or just want to say hi? Reach out any way that works for you.</p>
+  <div class="contact-grid">
+    <form class="contact-form" onsubmit="submitContactForm(event)">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contactName">Name</label>
+          <input type="text" id="contactName" name="name" placeholder="Your name" required />
+        </div>
+        <div class="form-field">
+          <label for="contactEmail">Email</label>
+          <input type="email" id="contactEmail" name="email" placeholder="you@example.com" required />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="contactSubject">Subject</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="What's this about?" />
+      </div>
+      <div class="form-field">
+        <label for="contactMessage">Message</label>
+        <textarea id="contactMessage" name="message" rows="4" placeholder="Tell us a bit more…" required></textarea>
+      </div>
+      <button type="submit" class="btn-primary contact-submit">SEND MESSAGE →</button>
+    </form>
+    <div class="contact-info">
+      <div class="contact-info-item">
+        <span>📍</span>
+        <div><strong>Visit Us</strong><p>Industrial Area, Nairobi, Kenya</p></div>
+      </div>
+      <div class="contact-info-item">
+        <span>📞</span>
+        <div><strong>Call Us</strong><p>+254 700 000 000</p></div>
+      </div>
+      <div class="contact-info-item">
+        <span>✉️</span>
+        <div><strong>Email Us</strong><p>hello@arkpeanuts.co.ke</p></div>
+      </div>
+      <div class="contact-info-item">
+        <span>🕐</span>
+        <div><strong>Working Hours</strong><p>Mon – Sat, 8:00 AM – 6:00 PM</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── FOOTER ── -->
 <footer>
   <div class="footer-grid">
@@ -400,16 +526,16 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
     <div class="footer-col">
       <h4>Company</h4>
       <ul>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Health Benefits</a></li>
-        <li><a href="#">Bulk Orders</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#benefits">Health Benefits</a></li>
+        <li><a href="#bulk">Bulk Orders</a></li>
         <li><a href="#">Blog</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Support</h4>
       <ul>
-        <li><a href="#">Contact Us</a></li>
+        <li><a href="#contact">Contact Us</a></li>
         <li><a href="#">FAQ</a></li>
         <li><a href="#">Shipping Policy</a></li>
         <li><a href="#">Returns</a></li>
