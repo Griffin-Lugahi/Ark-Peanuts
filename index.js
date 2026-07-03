@@ -148,6 +148,8 @@ document.getElementById('accountBtn').addEventListener('click', () => {
 });
 
 /* ── NAV LINKS: smooth scroll to matching sections ── */
+// All nav links now point to real in-page anchors (e.g. #about, #contact),
+// so we just intercept the click to close the mobile menu and do a smooth scroll.
 document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(link => {
   link.addEventListener('click', (e) => {
     const href = link.getAttribute('href') || '';
@@ -170,6 +172,16 @@ document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(link => {
     }
   });
 });
+
+/* ── FAQ ACCORDION ── */
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+
+  // close all, then reopen the clicked one if it wasn't already open
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
 
 /* ── CONTACT FORM ── */
 function submitContactForm(e) {
