@@ -148,8 +148,6 @@ document.getElementById('accountBtn').addEventListener('click', () => {
 });
 
 /* ── NAV LINKS: smooth scroll to matching sections ── */
-// All nav links now point to real in-page anchors (e.g. #about, #contact),
-// so we just intercept the click to close the mobile menu and do a smooth scroll.
 document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(link => {
   link.addEventListener('click', (e) => {
     const href = link.getAttribute('href') || '';
