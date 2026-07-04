@@ -19,6 +19,56 @@
 
 html { scroll-behavior: smooth; }
 
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes bounceSmall {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .7s cubic-bezier(.22,.68,0,1.01), transform .7s cubic-bezier(.22,.68,0,1.01);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s cubic-bezier(.22,.68,0,1.01), transform .6s cubic-bezier(.22,.68,0,1.01);
+}
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: .02s; }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: .09s; }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: .16s; }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: .23s; }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: .30s; }
+.reveal-stagger.visible > *:nth-child(6) { transition-delay: .37s; }
+.reveal-stagger.visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-load {
+  animation: fadeUp .9s cubic-bezier(.22,.68,0,1.01) both;
+}
+.reveal-load .btn-primary,
+.reveal-load .hero-badges { animation: fadeIn 1.2s ease .3s both; }
+
 body {
   font-family: 'Inter', sans-serif;
   background: var(--white);
@@ -47,7 +97,9 @@ nav {
   height: 100%;
   flex-shrink: 0;
   margin-right: 24px;
+  transition: transform .3s ease;
 }
+.nav-logo:hover { transform: scale(1.04) rotate(-1deg); }
 .nav-logo svg {
   height: 58px;
   width: auto;
@@ -73,7 +125,18 @@ nav {
   color: rgba(253,250,245,.85);
   font-weight: 500;
   transition: color .2s;
+  position: relative;
 }
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -6px;
+  width: 0;
+  height: 1.5px;
+  background: var(--gold-light);
+  transition: width .25s ease;
+}
+.nav-links a:hover::after { width: 100%; }
 .nav-links a:hover { color: var(--gold-light); }
 .has-drop::after { content: ' ▾'; font-size: .7rem; }
 
@@ -105,7 +168,9 @@ nav {
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  transition: transform .25s ease;
 }
+.cart-badge.bump { animation: popIn .35s ease; }
 
 /* ── SEARCH OVERLAY ── */
 .search-overlay {
@@ -286,8 +351,22 @@ nav {
   letter-spacing: .04em;
   width: fit-content;
   transition: background .25s, transform .15s;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
-.btn-primary:hover { background: var(--brown-mid); transform: translateY(-1px); }
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.25) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform .6s ease;
+  z-index: -1;
+}
+.btn-primary:hover::before { transform: translateX(120%); }
+.btn-primary:hover { background: var(--brown-mid); transform: translateY(-2px); }
+.btn-primary:active { transform: translateY(0) scale(.98); }
 
 .hero-badges {
   display: flex;
@@ -489,7 +568,9 @@ nav {
   font-size: 1.3rem;
   margin-bottom: 18px;
   box-shadow: 0 1px 6px rgba(44,31,15,.1);
+  transition: transform .3s ease;
 }
+.why-card:hover .why-icon { animation: bounceSmall .6s ease; }
 .why-card h3 {
   font-family: 'Playfair Display', serif;
   font-size: 1.02rem;
@@ -562,6 +643,11 @@ nav {
   margin: 0 auto 10px;
   display: block;
   border: 2px solid var(--cream-dark);
+  transition: transform .35s ease, border-color .3s ease;
+}
+.cat-card:hover .cat-img {
+  transform: scale(1.08) rotate(-2deg);
+  border-color: var(--gold);
 }
 .cat-name {
   font-size: .76rem;
@@ -581,7 +667,9 @@ nav {
   color: var(--gold);
   font-size: 1rem;
   box-shadow: 0 1px 4px rgba(44,31,15,.1);
+  transition: transform .3s ease;
 }
+.cat-card:hover .cat-arrow { transform: translateX(4px); }
 
 
 /* ── PRODUCTS ── */
@@ -622,7 +710,9 @@ nav {
   height: 130px;
   object-fit: cover;
   display: block;
+  transition: transform .4s ease;
 }
+.product-card:hover .product-img { transform: scale(1.07); }
 .product-info { padding: 12px 14px; }
 .product-name {
   font-size: .82rem;
@@ -656,9 +746,11 @@ nav {
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  transition: background .2s;
+  transition: background .2s, transform .2s;
 }
-.add-btn:hover { background: var(--gold); }
+.add-btn:hover { background: var(--gold); transform: rotate(90deg); }
+.add-btn:active { transform: scale(.85) rotate(90deg); }
+.add-btn.added { animation: popIn .3s ease; }
 
 /* ── PRODUCT BENEFITS ── */
 .benefits-section {
@@ -879,13 +971,16 @@ nav {
 .faq-answer {
   max-height: 0;
   overflow: hidden;
-  transition: max-height .3s ease, padding .3s ease;
+  opacity: 0;
+  transition: max-height .35s ease, padding .35s ease, opacity .3s ease;
   padding: 0 22px;
 }
 .faq-item.open .faq-answer {
   max-height: 240px;
+  opacity: 1;
   padding: 0 22px 20px;
 }
+.faq-item:not(.open) .faq-question:hover .faq-icon { transform: rotate(90deg); }
 .faq-answer p {
   font-size: .82rem;
   line-height: 1.65;
@@ -1079,6 +1174,7 @@ footer {
   margin-bottom: 18px;
   padding-bottom: 18px;
   border-bottom: 1px solid var(--cream-dark);
+  animation: fadeUp .35s cubic-bezier(.22,.68,0,1.01) both;
 }
 .cart-item-thumb {
   width: 58px; height: 58px;
