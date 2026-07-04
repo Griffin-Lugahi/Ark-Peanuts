@@ -615,6 +615,32 @@ nav {
   max-width: 1300px;
   margin: 0 auto;
 }
+.search-empty {
+  grid-column: 1 / -1;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--cream);
+  border: 1.5px dashed var(--gold-light);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: .85rem;
+  color: var(--text-body);
+  flex-wrap: wrap;
+}
+.search-empty button {
+  background: var(--brown-deep);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.search-empty button:hover { background: var(--gold); }
 
 /* ── CATEGORIES ── */
 .categories-grid {

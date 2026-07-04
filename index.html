@@ -162,6 +162,11 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 <!-- ── SHOP BY CATEGORY + BEST SELLERS ── -->
 <div class="two-col" id="shop">
 
+  <div class="search-empty" id="searchEmptyState" style="display:none;">
+    <span>No products match "<strong id="searchEmptyQuery"></strong>".</span>
+    <button onclick="clearProductSearch()">Clear search</button>
+  </div>
+
   <!-- Categories -->
   <div id="categories">
     <div class="section-header">

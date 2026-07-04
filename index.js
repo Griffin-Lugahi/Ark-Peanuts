@@ -135,15 +135,61 @@ searchOverlay.addEventListener('click', (e) => {
   if (e.target === searchOverlay) closeSearch();
 });
 searchInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && searchInput.value.trim()) {
-    showToast(`Searching for "${searchInput.value.trim()}"…`);
+  if (e.key === 'Enter') {
+    const query = searchInput.value.trim();
+    const matches = performProductSearch(query);
     closeSearch();
+
+    document.getElementById('shop').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    if (query) {
+      showToast(
+        matches > 0
+          ? `Found ${matches} result${matches === 1 ? '' : 's'} for "${query}"`
+          : `No results for "${query}"`
+      );
+    }
   }
   if (e.key === 'Escape') closeSearch();
 });
 function closeSearch() {
   searchOverlay.classList.remove('open');
   searchInput.value = '';
+}
+
+/* ── PRODUCT SEARCH / FILTER ── */
+function performProductSearch(query) {
+  const q = query.trim().toLowerCase();
+  let matches = 0;
+
+  function filterCards(selector, nameSelector) {
+    document.querySelectorAll(selector).forEach(card => {
+      const nameEl = card.querySelector(nameSelector);
+      const text = nameEl ? nameEl.textContent.toLowerCase() : '';
+      const isMatch = q === '' || text.includes(q);
+      card.style.display = isMatch ? '' : 'none';
+      if (isMatch && q !== '') matches++;
+    });
+  }
+
+  filterCards('.cat-card', '.cat-name');
+  filterCards('.product-card', '.product-name');
+
+  const emptyState = document.getElementById('searchEmptyState');
+  const emptyQuery = document.getElementById('searchEmptyQuery');
+  if (q !== '' && matches === 0) {
+    emptyState.style.display = 'flex';
+    emptyQuery.textContent = query.trim();
+  } else {
+    emptyState.style.display = 'none';
+  }
+
+  return matches;
+}
+
+function clearProductSearch() {
+  performProductSearch('');
+  showToast('Showing all products');
 }
 
 /* ── ACCOUNT ── */
