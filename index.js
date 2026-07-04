@@ -53,7 +53,11 @@ function changeQty(name, delta) {
 /* ── RENDER CART ── */
 function updateCart() {
   const count = cart.reduce((a, i) => a + i.qty, 0);
-  document.getElementById('cartCount').textContent = count;
+  const countEl = document.getElementById('cartCount');
+  countEl.textContent = count;
+  countEl.classList.remove('bump');
+  void countEl.offsetWidth; // restart animation
+  countEl.classList.add('bump');
 
   const container = document.getElementById('cartItems');
   const foot      = document.getElementById('cartFoot');
@@ -190,3 +194,46 @@ function submitContactForm(e) {
   document.getElementById('contactName').closest('form').reset();
   showToast(name ? `Thanks ${name}, we'll be in touch! 🥜` : 'Message sent, thank you!');
 }
+
+/* ── SCROLL REVEAL ── */
+const revealTargets = document.querySelectorAll('.reveal, .reveal-stagger');
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+revealTargets.forEach(el => revealObserver.observe(el));
+
+/* ── ANIMATED STAT COUNTERS ── */
+function animateCount(el) {
+  const target = parseInt(el.dataset.count, 10);
+  const suffix = el.dataset.suffix || '';
+  const duration = 1200;
+  const start = performance.now();
+
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const value = Math.round(target * eased);
+    el.textContent = value.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+const counterEls = document.querySelectorAll('[data-count]');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCount(entry.target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+counterEls.forEach(el => counterObserver.observe(el));
