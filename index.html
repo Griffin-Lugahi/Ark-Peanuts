@@ -115,6 +115,64 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
   </div>
 </div>
 
+<!-- ── ACCOUNT MODAL ── -->
+<div class="account-overlay" id="accountOverlay">
+  <div class="account-box">
+    <button class="account-close" id="accountCloseBtn" aria-label="Close account panel">✕</button>
+
+    <div class="account-tabs">
+      <button class="account-tab active" id="loginTabBtn" onclick="switchAccountTab('login')">Log In</button>
+      <button class="account-tab" id="signupTabBtn" onclick="switchAccountTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- Login form -->
+    <form class="account-form" id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" required />
+      </div>
+      <div class="form-field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required minlength="6" />
+      </div>
+      <p class="account-error" id="loginError"></p>
+      <button type="submit" class="btn-primary account-submit">LOG IN →</button>
+      <p class="account-switch">No account yet? <a href="#" onclick="switchAccountTab('signup'); return false;">Sign up</a></p>
+    </form>
+
+    <!-- Signup form -->
+    <form class="account-form" id="signupForm" onsubmit="handleSignup(event)" style="display:none;">
+      <div class="form-field">
+        <label for="signupName">Name</label>
+        <input type="text" id="signupName" placeholder="Your name" required />
+      </div>
+      <div class="form-field">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" required />
+      </div>
+      <div class="form-field">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" placeholder="At least 6 characters" required minlength="6" />
+      </div>
+      <p class="account-error" id="signupError"></p>
+      <button type="submit" class="btn-primary account-submit">CREATE ACCOUNT →</button>
+      <p class="account-switch">Already have an account? <a href="#" onclick="switchAccountTab('login'); return false;">Log in</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- ── ACCOUNT DROPDOWN (shown when logged in) ── -->
+<div class="account-dropdown" id="accountDropdown">
+  <div class="account-dropdown-user">
+    <div class="account-avatar" id="accountAvatar">?</div>
+    <div>
+      <strong id="accountDropdownName">—</strong>
+      <span id="accountDropdownEmail">—</span>
+    </div>
+  </div>
+  <button class="account-dropdown-logout" onclick="handleLogout()">Log Out</button>
+</div>
+
 <!-- ── MOBILE DROPDOWN MENU ── -->
 <div class="mobile-menu" id="mobileMenu">
   <ul>
