@@ -192,10 +192,154 @@ function clearProductSearch() {
   showToast('Showing all products');
 }
 
-/* ── ACCOUNT ── */
+/* ── ACCOUNT SYSTEM (front-end only, stored in localStorage) ── */
+const ACCOUNTS_KEY = 'arkpeanuts_accounts';
+const SESSION_KEY   = 'arkpeanuts_current_user';
+
+function getAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+function saveAccounts(accounts) {
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSION_KEY));
+  } catch {
+    return null;
+  }
+}
+function setCurrentUser(user) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+}
+function clearCurrentUser() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+const accountOverlay  = document.getElementById('accountOverlay');
+const accountDropdown = document.getElementById('accountDropdown');
+const loginForm       = document.getElementById('loginForm');
+const signupForm      = document.getElementById('signupForm');
+const loginTabBtn     = document.getElementById('loginTabBtn');
+const signupTabBtn    = document.getElementById('signupTabBtn');
+
+function openAccountModal() {
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('signupError').textContent = '';
+  accountOverlay.classList.add('open');
+}
+function closeAccountModal() {
+  accountOverlay.classList.remove('open');
+}
+function switchAccountTab(tab) {
+  const isLogin = tab === 'login';
+  loginForm.style.display  = isLogin ? 'flex' : 'none';
+  signupForm.style.display = isLogin ? 'none' : 'flex';
+  loginTabBtn.classList.toggle('active', isLogin);
+  signupTabBtn.classList.toggle('active', !isLogin);
+}
+
+function handleSignup(e) {
+  e.preventDefault();
+  const name     = document.getElementById('signupName').value.trim();
+  const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const errorEl  = document.getElementById('signupError');
+
+  const accounts = getAccounts();
+  if (accounts.some(a => a.email === email)) {
+    errorEl.textContent = 'An account with that email already exists.';
+    return;
+  }
+
+  const newAccount = { name, email, password };
+  accounts.push(newAccount);
+  saveAccounts(accounts);
+  setCurrentUser({ name, email });
+
+  closeAccountModal();
+  signupForm.reset();
+  refreshAccountUI();
+  showToast(`Welcome, ${name}! 🥜`);
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl  = document.getElementById('loginError');
+
+  const accounts = getAccounts();
+  const match = accounts.find(a => a.email === email && a.password === password);
+
+  if (!match) {
+    errorEl.textContent = 'Incorrect email or password.';
+    return;
+  }
+
+  setCurrentUser({ name: match.name, email: match.email });
+  closeAccountModal();
+  loginForm.reset();
+  refreshAccountUI();
+  showToast(`Welcome back, ${match.name}! 🥜`);
+}
+
+function handleLogout() {
+  clearCurrentUser();
+  accountDropdown.classList.remove('open');
+  refreshAccountUI();
+  showToast('Logged out');
+}
+
+function refreshAccountUI() {
+  const user = getCurrentUser();
+  const btn  = document.getElementById('accountBtn');
+
+  if (user) {
+    const initial = user.name.trim().charAt(0).toUpperCase() || '?';
+    btn.textContent = '';
+    const avatarSpan = document.createElement('span');
+    avatarSpan.className = 'account-avatar';
+    avatarSpan.style.cssText = 'width:26px;height:26px;font-size:.7rem;';
+    avatarSpan.textContent = initial;
+    btn.appendChild(avatarSpan);
+
+    document.getElementById('accountAvatar').textContent = initial;
+    document.getElementById('accountDropdownName').textContent = user.name;
+    document.getElementById('accountDropdownEmail').textContent = user.email;
+  } else {
+    btn.textContent = '👤';
+  }
+}
+
 document.getElementById('accountBtn').addEventListener('click', () => {
-  showToast('Account & login coming soon 👤');
+  const user = getCurrentUser();
+  if (user) {
+    accountDropdown.classList.toggle('open');
+  } else {
+    openAccountModal();
+  }
 });
+document.getElementById('accountCloseBtn').addEventListener('click', closeAccountModal);
+accountOverlay.addEventListener('click', (e) => {
+  if (e.target === accountOverlay) closeAccountModal();
+});
+document.addEventListener('click', (e) => {
+  if (
+    accountDropdown.classList.contains('open') &&
+    !accountDropdown.contains(e.target) &&
+    e.target.id !== 'accountBtn' &&
+    !e.target.closest('#accountBtn')
+  ) {
+    accountDropdown.classList.remove('open');
+  }
+});
+
+refreshAccountUI();
 
 /* ── NAV LINKS: smooth scroll to matching sections ── */
 // All nav links now point to real in-page anchors (e.g. #about, #contact),
