@@ -227,6 +227,15 @@ const signupForm      = document.getElementById('signupForm');
 const loginTabBtn     = document.getElementById('loginTabBtn');
 const signupTabBtn    = document.getElementById('signupTabBtn');
 
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const showing = input.type === 'password';
+  input.type = showing ? 'text' : 'password';
+  btn.classList.toggle('showing', showing);
+  btn.textContent = showing ? '🙈' : '👁';
+  btn.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
+}
+
 function openAccountModal() {
   document.getElementById('loginError').textContent = '';
   document.getElementById('signupError').textContent = '';
