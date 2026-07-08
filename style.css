@@ -1544,6 +1544,31 @@ footer {
   margin-top: 12px;
   opacity: .75;
 }
+.social-icons {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, color .2s, transform .2s;
+}
+.social-icon svg {
+  width: 17px;
+  height: 17px;
+}
+.social-icon:hover {
+  background: var(--gold);
+  color: #fff;
+  transform: translateY(-3px);
+}
 .footer-col h4 {
   font-size: .8rem;
   font-weight: 700;
