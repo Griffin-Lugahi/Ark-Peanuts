@@ -1,3 +1,26 @@
+/* ── DARK MODE ── */
+const THEME_KEY = 'arkpeanuts_theme';
+
+function getPreferredTheme() {
+  const stored = localStorage.getItem(THEME_KEY);
+  if (stored) return stored;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+applyTheme(getPreferredTheme());
+
+document.getElementById('themeToggleBtn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
 let cart = [];
 
 /* ── CART OPEN / CLOSE ── */
