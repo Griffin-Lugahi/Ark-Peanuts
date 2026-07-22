@@ -15,6 +15,62 @@
   --text-body:  #2b2520;
   --text-muted: #6e6358;
   --white:      #fdfaf5;
+  color-scheme: light;
+}
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --cream:      #211e19;
+  --cream-dark: #3a332a;
+  --white:      #2a251f;
+  --text-body:  #ece7dc;
+  --text-muted: #b0a692;
+}
+
+/* smooth theme transitions everywhere */
+*, *::before, *::after {
+  transition: background-color .3s ease, border-color .3s ease, color .3s ease;
+}
+
+/* fix: brown-deep is used as TEXT color on light cards in a few places —
+   force those to light text in dark mode (brown-deep itself stays dark,
+   it's still correct for nav/footer/buttons which are always-dark surfaces) */
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .about-stat strong,
+[data-theme="dark"] .why-card h3,
+[data-theme="dark"] .cat-name,
+[data-theme="dark"] .product-name,
+[data-theme="dark"] .product-price,
+[data-theme="dark"] .review-author strong,
+[data-theme="dark"] .reviews-summary-score,
+[data-theme="dark"] .faq-question,
+[data-theme="dark"] .shipping-zone h3,
+[data-theme="dark"] .shipping-detail-col h3,
+[data-theme="dark"] .returns-step h3,
+[data-theme="dark"] .returns-policy-col h3,
+[data-theme="dark"] .contact-info-item strong,
+[data-theme="dark"] .form-field label,
+[data-theme="dark"] .account-form .form-field label,
+[data-theme="dark"] .account-dropdown-user strong,
+[data-theme="dark"] .account-dropdown-logout,
+[data-theme="dark"] .cart-head h3,
+[data-theme="dark"] .cart-item-name {
+  color: var(--text-body);
+}
+
+/* fix: btn-primary text uses var(--white), which is now a dark tone */
+[data-theme="dark"] .btn-primary {
+  color: #fdfaf5;
+}
+
+/* slightly stronger shadows so cards still lift off a dark bg */
+[data-theme="dark"] .about-image,
+[data-theme="dark"] .search-box,
+[data-theme="dark"] .account-box,
+[data-theme="dark"] .account-dropdown,
+[data-theme="dark"] .cart-panel {
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
 }
 
 html { scroll-behavior: smooth; }
@@ -210,6 +266,7 @@ nav {
   font-family: 'Inter', sans-serif;
   padding: 10px 0;
   color: var(--text-body);
+  background: transparent;
 }
 .search-box button {
   background: none;
@@ -708,7 +765,12 @@ nav {
   color: var(--brown-deep);
   transition: background .2s, color .2s;
 }
+[data-theme="dark"] .btn-outline {
+  border-color: var(--gold-light);
+  color: var(--gold-light);
+}
 .btn-outline:hover { background: var(--brown-deep); color: #fff; }
+[data-theme="dark"] .btn-outline:hover { background: var(--gold-light); color: var(--brown-deep); }
 .bulk-perks {
   display: flex;
   flex-direction: column;
@@ -730,6 +792,7 @@ nav {
   color: var(--brown-deep);
   margin-bottom: 4px;
 }
+[data-theme="dark"] .bulk-perk strong { color: var(--text-body); }
 .bulk-perk p {
   font-size: .78rem;
   color: var(--text-muted);
@@ -1728,6 +1791,7 @@ footer {
   color: var(--brown-deep);
   margin-bottom: 16px;
 }
+[data-theme="dark"] .cart-total { color: var(--text-body); }
 .checkout-btn {
   display: block;
   width: 100%;
