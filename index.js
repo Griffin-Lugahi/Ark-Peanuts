@@ -21,7 +21,221 @@ document.getElementById('themeToggleBtn').addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
+/* ── PRODUCT DATA (single source of truth for cards, modal, and cart) ── */
+const products = [
+  {
+    id: 'cashewnut-butter',
+    name: 'Cashewnut Butter',
+    image: 'nuts/cashewnut Butter .png',
+    badge: 'Best Seller',
+    description: 'Smooth, small-batch roasted cashew butter with no added oils or sugar. A rich, creamy spread that\'s just as good on toast as it is by the spoonful.',
+    rating: 4.9,
+    reviewCount: 86,
+    variants: [
+      { label: '250g', price: 600 },
+      { label: '500g', price: 1000 },
+      { label: '1kg', price: 1800 }
+    ],
+    reviews: [
+      { name: 'David M.', initials: 'DM', stars: 5, date: 'Verified Buyer · Mombasa', text: 'Smooth, rich, and no weird additives. Will reorder monthly.' },
+      { name: 'Fatuma S.', initials: 'FS', stars: 5, date: 'Verified Buyer · Nairobi', text: 'Best cashew butter I\'ve tried in Kenya, tastes fresh every time.' },
+      { name: 'Peter K.', initials: 'PK', stars: 4, date: 'Verified Buyer · Thika', text: 'Great flavour, wish the jar was a bit bigger for the price.' }
+    ]
+  },
+  {
+    id: 'roasted-peanuts',
+    name: 'Roasted Peanuts',
+    image: 'nuts/Roasted Peanuts .png',
+    badge: 'Best Seller',
+    description: 'Lightly salted, small-batch roasted peanuts with a satisfying crunch. No preservatives, no added oils, just the nut the way nature made it.',
+    rating: 4.8,
+    reviewCount: 142,
+    variants: [
+      { label: '220g', price: 150 },
+      { label: '500g', price: 320 },
+      { label: '1kg', price: 580 }
+    ],
+    reviews: [
+      { name: 'Wanjiru K.', initials: 'WK', stars: 5, date: 'Verified Buyer · Nairobi', text: 'Tastes so fresh, like they were just harvested.' },
+      { name: 'James N.', initials: 'JN', stars: 5, date: 'Verified Buyer · Nakuru', text: 'My go-to snack for the office now, perfectly roasted.' },
+      { name: 'Grace W.', initials: 'GW', stars: 4, date: 'Verified Buyer · Kiambu', text: 'Good crunch and flavour, a little salty for my taste but still great.' }
+    ]
+  },
+  {
+    id: 'sesame-brittles',
+    name: 'Sesame Brittles',
+    image: 'nuts/Sesame brittles.png',
+    badge: 'Best Seller',
+    description: 'Crunchy sesame brittles made with roasted sesame seeds and natural sweetener. Not overly sweet, and packaged to stay fresh for weeks.',
+    rating: 4.9,
+    reviewCount: 64,
+    variants: [
+      { label: '500g', price: 250 },
+      { label: '1kg', price: 450 }
+    ],
+    reviews: [
+      { name: 'James N.', initials: 'JN', stars: 5, date: 'Verified Buyer · Nakuru', text: 'Perfectly crunchy and not overly sweet. Packaging keeps them fresh for weeks.' },
+      { name: 'Susan A.', initials: 'SA', stars: 5, date: 'Verified Buyer · Eldoret', text: 'Bought these for a road trip, gone before we even arrived.' }
+    ]
+  },
+  {
+    id: 'peanut-butter',
+    name: 'Peanut Butter',
+    image: 'nuts/Peanut Butter.png',
+    badge: 'Best Seller',
+    description: 'Classic small-batch roasted peanut butter, smooth and rich with zero added sugar. A pantry staple the whole family can enjoy.',
+    rating: 4.7,
+    reviewCount: 118,
+    variants: [
+      { label: '500g', price: 600 },
+      { label: '1kg', price: 1100 }
+    ],
+    reviews: [
+      { name: 'Amina O.', initials: 'AO', stars: 5, date: 'Verified Buyer · Kisumu', text: 'Everyone kept asking where the snacks were from at our event.' },
+      { name: 'Brian O.', initials: 'BO', stars: 4, date: 'Verified Buyer · Nairobi', text: 'Great taste, a little runnier than store-bought brands but still good.' },
+      { name: 'Lucy M.', initials: 'LM', stars: 5, date: 'Verified Buyer · Nyeri', text: 'Kids love it on toast every morning, no complaints here.' }
+    ]
+  }
+];
+
+let activeProduct = null;
+let activeVariantIndex = 0;
+let modalQty = 1;
+
+/* ── STAR RATING RENDER ── */
+function renderStars(rating) {
+  const full = Math.round(rating);
+  return '★'.repeat(full) + '☆'.repeat(5 - full);
+}
+
+/* ── RENDER PRODUCT CARDS ── */
+function renderProductCards() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+
+  grid.innerHTML = products.map(p => `
+    <div class="product-card" onclick="openProductModal('${p.id}')">
+      ${p.badge ? `<span class="best-badge">${p.badge}</span>` : ''}
+      <img class="product-img" src="${p.image}" alt="${p.name}" />
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-card-rating">
+          <span class="stars-sm">${renderStars(p.rating)}</span>
+          <span class="rating-count-sm">(${p.reviewCount})</span>
+        </div>
+        <div class="product-weight">${p.variants[0].label}</div>
+        <div class="product-footer">
+          <div class="product-price">KSh ${p.variants[0].price.toLocaleString()}</div>
+          <button class="add-btn" onclick="event.stopPropagation(); quickAddToCart('${p.id}', this)">+</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── QUICK ADD (from card, uses first/default variant) ── */
+function quickAddToCart(productId, btn) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  const variant = product.variants[0];
+  addToCart(`${product.name} - ${variant.label}`, variant.price, btn);
+}
+
+/* ── PRODUCT MODAL ── */
+function openProductModal(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  activeProduct = product;
+  activeVariantIndex = 0;
+  modalQty = 1;
+
+  document.getElementById('modalBadge').style.display = product.badge ? 'inline-block' : 'none';
+  document.getElementById('modalBadge').textContent = product.badge || '';
+  document.getElementById('modalImg').src = product.image;
+  document.getElementById('modalImg').alt = product.name;
+  document.getElementById('modalName').textContent = product.name;
+  document.getElementById('modalStars').textContent = renderStars(product.rating);
+  document.getElementById('modalRatingCount').textContent = `${product.rating.toFixed(1)} (${product.reviewCount} reviews)`;
+  document.getElementById('modalDesc').textContent = product.description;
+  document.getElementById('modalQty').textContent = modalQty;
+
+  renderModalVariants();
+  updateModalPrice();
+  renderModalReviews();
+
+  document.getElementById('productModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProductModal() {
+  document.getElementById('productModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderModalVariants() {
+  const container = document.getElementById('modalVariants');
+  container.innerHTML = activeProduct.variants.map((v, i) => `
+    <button class="variant-btn ${i === activeVariantIndex ? 'active' : ''}" onclick="selectVariant(${i})">
+      ${v.label}
+    </button>
+  `).join('');
+}
+
+function selectVariant(index) {
+  activeVariantIndex = index;
+  renderModalVariants();
+  updateModalPrice();
+}
+
+function updateModalPrice() {
+  const variant = activeProduct.variants[activeVariantIndex];
+  const total = variant.price * modalQty;
+  document.getElementById('modalPrice').textContent = 'KSh ' + total.toLocaleString();
+}
+
+function changeModalQty(delta) {
+  modalQty = Math.max(1, modalQty + delta);
+  document.getElementById('modalQty').textContent = modalQty;
+  updateModalPrice();
+}
+
+function renderModalReviews() {
+  const container = document.getElementById('modalReviewsList');
+  container.innerHTML = activeProduct.reviews.map(r => `
+    <div class="modal-review-card">
+      <div class="modal-review-head">
+        <div class="review-avatar">${r.initials}</div>
+        <div>
+          <strong>${r.name}</strong>
+          <span>${r.date}</span>
+        </div>
+        <span class="modal-review-stars">${renderStars(r.stars)}</span>
+      </div>
+      <p>${r.text}</p>
+    </div>
+  `).join('');
+}
+
+function addModalToCart() {
+  const variant = activeProduct.variants[activeVariantIndex];
+  const existing = cart.find(i => i.name === `${activeProduct.name} - ${variant.label}`);
+  if (existing) {
+    existing.qty += modalQty;
+  } else {
+    cart.push({ name: `${activeProduct.name} - ${variant.label}`, price: variant.price, qty: modalQty });
+  }
+  updateCart();
+  showToast(`${activeProduct.name} (${variant.label}) added to cart!`);
+  closeProductModal();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeProductModal();
+});
+
 let cart = [];
+renderProductCards();
 
 /* ── CART OPEN / CLOSE ── */
 document.getElementById('cartBtn').addEventListener('click', openCart);
