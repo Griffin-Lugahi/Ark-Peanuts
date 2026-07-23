@@ -234,6 +234,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeProductModal();
     closeCheckoutModal();
+    closeOrdersModal();
   }
 });
 
@@ -309,6 +310,25 @@ function submitCheckout(e) {
 
   const name = document.getElementById('checkoutName').value.trim();
   const orderNumber = generateOrderNumber();
+  const city = document.getElementById('checkoutCity').value;
+  const subtotal = cart.reduce((a, i) => a + i.price * i.qty, 0);
+  const delivery = calcDeliveryFee(subtotal);
+  const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+  saveOrder({
+    orderNumber,
+    timestamp: Date.now(),
+    customerName: name,
+    customerEmail: document.getElementById('checkoutEmail').value.trim(),
+    customerPhone: document.getElementById('checkoutPhone').value.trim(),
+    address: document.getElementById('checkoutAddress').value.trim(),
+    city,
+    paymentMethod,
+    items: cart.map(i => ({ ...i })),
+    subtotal,
+    delivery,
+    total: subtotal + delivery
+  });
 
   document.getElementById('checkoutFormView').style.display = 'none';
   document.getElementById('checkoutSuccessView').style.display = 'block';
@@ -321,6 +341,115 @@ function submitCheckout(e) {
   document.getElementById('checkoutForm').reset();
   setPaymentMethod(document.querySelector('input[name="payment"][value="mpesa"]'));
 }
+
+/* ── ORDER HISTORY / TRACKING ── */
+const ORDERS_KEY = 'arkpeanuts_orders';
+const CITY_DELIVERY_DAYS = { nairobi: 1, major: 3, upcountry: 5 };
+const CITY_LABELS = { nairobi: 'Nairobi', major: 'Major Town', upcountry: 'Upcountry / Rural' };
+const PAYMENT_LABELS = { mpesa: 'M-Pesa', card: 'Card', cod: 'Cash on Delivery' };
+
+function getOrders() {
+  try {
+    return JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+function saveOrder(order) {
+  const orders = getOrders();
+  orders.unshift(order); // newest first
+  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+}
+
+/* Realistic, time-based status: no backend, so we derive progress from how
+   long ago the order was placed vs. the delivery estimate for its area. */
+function computeOrderStatus(order) {
+  const days = CITY_DELIVERY_DAYS[order.city] || CITY_DELIVERY_DAYS.nairobi;
+  const totalMs = days * 24 * 60 * 60 * 1000;
+  const elapsed = Date.now() - order.timestamp;
+
+  if (elapsed >= totalMs) return { step: 3, label: 'Delivered' };
+  if (elapsed >= totalMs / 3) return { step: 2, label: 'Out for Delivery' };
+  return { step: 1, label: 'Processing' };
+}
+
+function formatOrderDate(ts) {
+  return new Date(ts).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function openOrdersModal() {
+  renderOrderHistory();
+  document.getElementById('ordersOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeOrdersModal() {
+  document.getElementById('ordersOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderOrderHistory() {
+  const orders = getOrders();
+  const listEl = document.getElementById('ordersList');
+  const emptyEl = document.getElementById('ordersEmpty');
+
+  if (orders.length === 0) {
+    listEl.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    return;
+  }
+  listEl.style.display = 'flex';
+  emptyEl.style.display = 'none';
+
+  const steps = ['Processing', 'Out for Delivery', 'Delivered'];
+
+  listEl.innerHTML = orders.map(order => {
+    const status = computeOrderStatus(order);
+    const itemsHtml = order.items.map(i => `
+      <div class="order-item-row">
+        <span>${i.name} × ${i.qty}</span>
+        <span>KSh ${(i.price * i.qty).toLocaleString()}</span>
+      </div>
+    `).join('');
+
+    const stepsHtml = steps.map((label, i) => {
+      const stepNum = i + 1;
+      const state = stepNum < status.step ? 'done' : stepNum === status.step ? 'active' : '';
+      return `
+        <div class="order-step ${state}">
+          <span class="order-step-dot"></span>
+          <span class="order-step-label">${label}</span>
+        </div>
+      `;
+    }).join('<span class="order-step-line"></span>');
+
+    return `
+      <div class="order-card">
+        <div class="order-card-head">
+          <div>
+            <strong>${order.orderNumber}</strong>
+            <span class="order-card-date">${formatOrderDate(order.timestamp)}</span>
+          </div>
+          <span class="order-status-badge status-step-${status.step}">${status.label}</span>
+        </div>
+
+        <div class="order-progress">${stepsHtml}</div>
+
+        <div class="order-items">${itemsHtml}</div>
+
+        <div class="order-card-foot">
+          <div class="order-card-meta">
+            <span>${CITY_LABELS[order.city] || order.city}</span>
+            <span>·</span>
+            <span>${PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}</span>
+          </div>
+          <div class="order-card-total">KSh ${order.total.toLocaleString()}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('ordersBtn').addEventListener('click', openOrdersModal);
 
 let cart = [];
 renderProductCards();
