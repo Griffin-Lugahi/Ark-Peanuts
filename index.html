@@ -332,6 +332,108 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
   </div>
 </div>
 
+<!-- ── CHECKOUT MODAL ── -->
+<div class="product-modal-overlay" id="checkoutOverlay" onclick="if(event.target===this) closeCheckoutModal()">
+  <div class="checkout-modal" id="checkoutModal">
+    <button class="product-modal-close" onclick="closeCheckoutModal()" aria-label="Close">✕</button>
+
+    <!-- Form view -->
+    <div id="checkoutFormView">
+      <h2 class="checkout-title">Checkout</h2>
+      <div class="checkout-grid">
+
+        <form class="checkout-form-col" id="checkoutForm" onsubmit="submitCheckout(event)">
+          <h3 class="checkout-section-title">Delivery Details</h3>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="checkoutName">Full Name</label>
+              <input type="text" id="checkoutName" placeholder="Your name" required />
+            </div>
+            <div class="form-field">
+              <label for="checkoutPhone">Phone Number</label>
+              <input type="tel" id="checkoutPhone" placeholder="07XX XXX XXX" required />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="checkoutEmail">Email</label>
+            <input type="email" id="checkoutEmail" placeholder="you@example.com" required />
+          </div>
+          <div class="form-field">
+            <label for="checkoutAddress">Delivery Address</label>
+            <input type="text" id="checkoutAddress" placeholder="Street, building, apartment" required />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="checkoutCity">Delivery Area</label>
+              <select id="checkoutCity" required onchange="renderCheckoutSummary()">
+                <option value="nairobi">Nairobi</option>
+                <option value="major">Major Town (Mombasa, Kisumu, Nakuru, Eldoret)</option>
+                <option value="upcountry">Upcountry / Rural</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="checkoutNotes">Delivery Notes (optional)</label>
+              <input type="text" id="checkoutNotes" placeholder="Gate code, landmark, etc." />
+            </div>
+          </div>
+
+          <h3 class="checkout-section-title">Payment Method</h3>
+          <div class="payment-options" id="paymentOptions">
+            <label class="payment-option active">
+              <input type="radio" name="payment" value="mpesa" checked onchange="setPaymentMethod(this)" />
+              <span class="payment-icon">📱</span>
+              <span class="payment-label">M-Pesa</span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="card" onchange="setPaymentMethod(this)" />
+              <span class="payment-icon">💳</span>
+              <span class="payment-label">Card</span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="cod" onchange="setPaymentMethod(this)" />
+              <span class="payment-icon">💵</span>
+              <span class="payment-label">Cash on Delivery</span>
+            </label>
+          </div>
+          <p class="payment-hint" id="paymentHint">You'll receive an M-Pesa prompt once your order is confirmed.</p>
+
+          <button type="submit" class="btn-primary checkout-submit-btn">PLACE ORDER →</button>
+        </form>
+
+        <div class="checkout-summary-col">
+          <h3 class="checkout-section-title">Order Summary</h3>
+          <div class="checkout-summary-items" id="checkoutItems"></div>
+          <div class="checkout-summary-totals">
+            <div class="checkout-summary-row">
+              <span>Subtotal</span>
+              <span id="checkoutSubtotal">KSh 0</span>
+            </div>
+            <div class="checkout-summary-row">
+              <span>Delivery</span>
+              <span id="checkoutDelivery">KSh 0</span>
+            </div>
+            <div class="checkout-summary-row checkout-summary-total">
+              <span>Total</span>
+              <span id="checkoutTotal">KSh 0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Success view -->
+    <div id="checkoutSuccessView" style="display:none;">
+      <div class="checkout-success">
+        <div class="checkout-success-icon">✓</div>
+        <h2>Order Placed!</h2>
+        <p>Thanks<span id="successName"></span>, your order <strong id="successOrderNumber"></strong> has been received. We'll reach out on WhatsApp or email to confirm delivery details.</p>
+        <button class="btn-primary" onclick="closeCheckoutModal()">CONTINUE SHOPPING →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── ABOUT US ── -->
 <section class="about-section reveal" id="about">
   <div class="about-grid">
@@ -839,7 +941,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
       <span>Total</span>
       <span id="cartTotal">KSh 0</span>
     </div>
-    <button class="checkout-btn">Proceed to Checkout</button>
+    <button class="checkout-btn" onclick="openCheckoutModal()">Proceed to Checkout</button>
   </div>
 </div>
 
