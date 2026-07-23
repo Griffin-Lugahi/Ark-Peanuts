@@ -1050,6 +1050,261 @@ nav {
 .add-btn:active { transform: scale(.85) rotate(90deg); }
 .add-btn.added { animation: popIn .3s ease; }
 
+/* ── PRODUCT CARD RATING ── */
+.product-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.stars-sm {
+  color: var(--gold);
+  font-size: .72rem;
+  letter-spacing: 1px;
+}
+.rating-count-sm {
+  font-size: .68rem;
+  color: var(--text-muted);
+}
+
+/* ── PRODUCT DETAIL MODAL ── */
+.product-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,17,13,.6);
+  backdrop-filter: blur(3px);
+  z-index: 270;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.product-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.product-modal {
+  background: var(--white);
+  width: 100%;
+  max-width: 920px;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  position: relative;
+  transform: translateY(24px) scale(.98);
+  transition: transform .3s cubic-bezier(.22,.68,0,1.01);
+}
+.product-modal-overlay.open .product-modal { transform: translateY(0) scale(1); }
+
+.product-modal-close {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 36px; height: 36px;
+  background: var(--white);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,.15);
+  z-index: 5;
+  transition: color .2s, transform .2s;
+}
+.product-modal-close:hover { color: var(--gold); transform: rotate(90deg); }
+
+.product-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.product-modal-media {
+  position: relative;
+  background: var(--cream);
+  border-radius: 20px 0 0 0;
+  overflow: hidden;
+  min-height: 340px;
+}
+.product-modal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.product-modal-info {
+  padding: 40px 40px 32px;
+  display: flex;
+  flex-direction: column;
+}
+.product-modal-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--brown-deep);
+  margin-bottom: 10px;
+}
+[data-theme="dark"] .product-modal-name { color: var(--text-body); }
+.product-modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.product-modal-rating .stars {
+  color: var(--gold);
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+.rating-count {
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+.product-modal-desc {
+  font-size: .88rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 26px;
+}
+.modal-field-label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.modal-variant-block { margin-bottom: 24px; }
+.variant-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.variant-btn {
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--cream-dark);
+  background: var(--white);
+  color: var(--text-body);
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.variant-btn:hover { border-color: var(--gold-light); }
+.variant-btn.active {
+  border-color: var(--brown-deep);
+  background: var(--brown-deep);
+  color: #fff;
+}
+[data-theme="dark"] .variant-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--brown-deep);
+}
+
+.modal-qty-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--cream-dark);
+}
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.qty-stepper .qty-btn {
+  width: 32px; height: 32px;
+  font-size: 1rem;
+  border-radius: 6px;
+}
+.qty-stepper span {
+  font-size: 1rem;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+  color: var(--brown-deep);
+}
+[data-theme="dark"] .qty-stepper span { color: var(--text-body); }
+.modal-price-block { text-align: right; }
+.modal-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--brown-deep);
+}
+[data-theme="dark"] .modal-price { color: var(--text-body); }
+.modal-add-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.product-modal-reviews {
+  padding: 32px 40px 40px;
+  border-top: 1px solid var(--cream-dark);
+}
+.product-modal-reviews h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--brown-deep);
+  margin-bottom: 18px;
+}
+[data-theme="dark"] .product-modal-reviews h3 { color: var(--text-body); }
+.modal-reviews-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.modal-review-card {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.modal-review-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.modal-review-head strong {
+  display: block;
+  font-size: .8rem;
+  color: var(--brown-deep);
+}
+[data-theme="dark"] .modal-review-head strong { color: var(--text-body); }
+.modal-review-head span {
+  font-size: .68rem;
+  color: var(--text-muted);
+}
+.modal-review-stars {
+  margin-left: auto;
+  color: var(--gold);
+  font-size: .75rem;
+  letter-spacing: 1px;
+}
+.modal-review-card p {
+  font-size: .8rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+@media (max-width: 760px) {
+  .product-modal-grid { grid-template-columns: 1fr; }
+  .product-modal-media { border-radius: 20px 20px 0 0; min-height: 220px; }
+  .product-modal-info { padding: 28px 24px 24px; }
+  .product-modal-reviews { padding: 24px 24px 32px; }
+  .modal-reviews-list { grid-template-columns: 1fr; }
+  .modal-qty-row { flex-wrap: wrap; }
+}
+
 /* ── PRODUCT BENEFITS ── */
 .benefits-section {
   background: var(--brown-deep);
