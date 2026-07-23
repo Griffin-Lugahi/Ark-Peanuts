@@ -99,6 +99,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
  <div class="nav-actions">
   <button aria-label="Toggle dark mode" id="themeToggleBtn">🌙</button>
   <button aria-label="Search" id="searchBtn">🔍</button>
+  <button aria-label="My Orders" id="ordersBtn">📦</button>
   <button aria-label="Account" id="accountBtn">👤</button>
   <button aria-label="Cart" id="cartBtn" style="position:relative;">
     🛒<span class="cart-badge" id="cartCount">0</span>
@@ -428,8 +429,26 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
         <div class="checkout-success-icon">✓</div>
         <h2>Order Placed!</h2>
         <p>Thanks<span id="successName"></span>, your order <strong id="successOrderNumber"></strong> has been received. We'll reach out on WhatsApp or email to confirm delivery details.</p>
-        <button class="btn-primary" onclick="closeCheckoutModal()">CONTINUE SHOPPING →</button>
+        <button class="btn-primary" onclick="closeCheckoutModal(); openOrdersModal();">TRACK MY ORDER →</button>
+        <button class="btn-outline checkout-success-secondary" onclick="closeCheckoutModal()">CONTINUE SHOPPING</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORDER HISTORY / TRACKING MODAL ── -->
+<div class="product-modal-overlay" id="ordersOverlay" onclick="if(event.target===this) closeOrdersModal()">
+  <div class="orders-modal" id="ordersModal">
+    <button class="product-modal-close" onclick="closeOrdersModal()" aria-label="Close">✕</button>
+    <h2 class="checkout-title">My Orders</h2>
+    <p class="orders-subtitle">Orders placed from this browser. Track delivery progress below.</p>
+
+    <div id="ordersList" class="orders-list"></div>
+
+    <div id="ordersEmpty" class="orders-empty" style="display:none;">
+      <span style="font-size:2rem;">📦</span>
+      <p>No orders yet.</p>
+      <button class="btn-primary" onclick="closeOrdersModal()">START SHOPPING →</button>
     </div>
   </div>
 </div>
