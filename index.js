@@ -231,8 +231,96 @@ function addModalToCart() {
 }
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeProductModal();
+  if (e.key === 'Escape') {
+    closeProductModal();
+    closeCheckoutModal();
+  }
 });
+
+/* ── CHECKOUT ── */
+const DELIVERY_FEES = { nairobi: 200, major: 400, upcountry: 600 };
+const FREE_DELIVERY_THRESHOLD = 3000; // Nairobi only, per shipping policy
+
+function openCheckoutModal() {
+  if (cart.length === 0) {
+    showToast('Your cart is empty 🥜');
+    return;
+  }
+  closeCart();
+  document.getElementById('checkoutFormView').style.display = 'block';
+  document.getElementById('checkoutSuccessView').style.display = 'none';
+  renderCheckoutSummary();
+  document.getElementById('checkoutOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCheckoutModal() {
+  document.getElementById('checkoutOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function calcDeliveryFee(subtotal) {
+  const city = document.getElementById('checkoutCity').value;
+  if (city === 'nairobi' && subtotal >= FREE_DELIVERY_THRESHOLD) return 0;
+  return DELIVERY_FEES[city] ?? DELIVERY_FEES.nairobi;
+}
+
+function renderCheckoutSummary() {
+  const container = document.getElementById('checkoutItems');
+  container.innerHTML = cart.map(item => `
+    <div class="checkout-summary-item">
+      <div class="cart-item-thumb">🥜</div>
+      <div class="checkout-summary-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <span>Qty ${item.qty}</span>
+      </div>
+      <div class="checkout-summary-item-price">KSh ${(item.price * item.qty).toLocaleString()}</div>
+    </div>
+  `).join('');
+
+  const subtotal = cart.reduce((a, i) => a + i.price * i.qty, 0);
+  const delivery = calcDeliveryFee(subtotal);
+  const total = subtotal + delivery;
+
+  document.getElementById('checkoutSubtotal').textContent = 'KSh ' + subtotal.toLocaleString();
+  document.getElementById('checkoutDelivery').textContent = delivery === 0 ? 'FREE' : 'KSh ' + delivery.toLocaleString();
+  document.getElementById('checkoutTotal').textContent = 'KSh ' + total.toLocaleString();
+}
+
+function setPaymentMethod(input) {
+  document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active'));
+  input.closest('.payment-option').classList.add('active');
+
+  const hints = {
+    mpesa: 'You\'ll receive an M-Pesa prompt once your order is confirmed.',
+    card: 'You\'ll be redirected to a secure card payment page after placing your order.',
+    cod: 'Pay in cash when your order arrives. Available within Nairobi only.'
+  };
+  document.getElementById('paymentHint').textContent = hints[input.value] || '';
+}
+
+function generateOrderNumber() {
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return 'AP-' + Date.now().toString().slice(-6) + random;
+}
+
+function submitCheckout(e) {
+  e.preventDefault();
+
+  const name = document.getElementById('checkoutName').value.trim();
+  const orderNumber = generateOrderNumber();
+
+  document.getElementById('checkoutFormView').style.display = 'none';
+  document.getElementById('checkoutSuccessView').style.display = 'block';
+  document.getElementById('successName').textContent = name ? `, ${name}` : '';
+  document.getElementById('successOrderNumber').textContent = orderNumber;
+
+  // Clear cart now that the order has been "placed"
+  cart = [];
+  updateCart();
+  document.getElementById('checkoutForm').reset();
+  setPaymentMethod(document.querySelector('input[name="payment"][value="mpesa"]'));
+}
 
 let cart = [];
 renderProductCards();
