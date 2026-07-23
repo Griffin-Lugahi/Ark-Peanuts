@@ -1505,6 +1505,183 @@ nav {
   .payment-options { grid-template-columns: 1fr; }
 }
 
+/* ── ORDER HISTORY / TRACKING MODAL ── */
+.orders-modal {
+  background: var(--white);
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  position: relative;
+  padding: 40px 40px 36px;
+  transform: translateY(24px) scale(.98);
+  transition: transform .3s cubic-bezier(.22,.68,0,1.01);
+}
+.product-modal-overlay.open .orders-modal { transform: translateY(0) scale(1); }
+
+.orders-subtitle {
+  font-size: .84rem;
+  color: var(--text-muted);
+  margin: -14px 0 24px;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.order-card {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+.order-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.order-card-head strong {
+  display: block;
+  font-size: .9rem;
+  color: var(--brown-deep);
+  letter-spacing: .02em;
+}
+[data-theme="dark"] .order-card-head strong { color: var(--text-body); }
+.order-card-date {
+  display: block;
+  font-size: .72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.order-status-badge {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.status-step-1 { background: rgba(196,132,47,.18); color: var(--gold); }
+.status-step-2 { background: rgba(74,124,78,.15); color: #4a7c4e; }
+.status-step-3 { background: #4a7c4e; color: #fff; }
+
+/* progress stepper */
+.order-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+.order-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  width: 90px;
+}
+.order-step-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--cream-dark);
+  border: 2px solid var(--cream-dark);
+  transition: background .2s, border-color .2s;
+}
+.order-step.done .order-step-dot,
+.order-step.active .order-step-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.order-step.done .order-step-dot { background: #4a7c4e; border-color: #4a7c4e; }
+.order-step-label {
+  font-size: .66rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+.order-step.active .order-step-label,
+.order-step.done .order-step-label {
+  color: var(--brown-deep);
+}
+[data-theme="dark"] .order-step.active .order-step-label,
+[data-theme="dark"] .order-step.done .order-step-label {
+  color: var(--text-body);
+}
+.order-step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--cream-dark);
+  margin-bottom: 18px;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--white);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+
+.order-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.order-card-meta {
+  display: flex;
+  gap: 6px;
+  font-size: .74rem;
+  color: var(--text-muted);
+}
+.order-card-total {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--brown-deep);
+}
+[data-theme="dark"] .order-card-total { color: var(--text-body); }
+
+.orders-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 50px 0 20px;
+  text-align: center;
+}
+.orders-empty p {
+  font-size: .9rem;
+  color: var(--text-muted);
+}
+
+.checkout-success-secondary {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .orders-modal { padding: 30px 22px 26px; }
+  .order-step { width: 70px; }
+  .order-step-label { font-size: .6rem; }
+}
+
 /* ── PRODUCT BENEFITS ── */
 .benefits-section {
   background: var(--brown-deep);
