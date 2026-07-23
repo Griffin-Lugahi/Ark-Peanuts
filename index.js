@@ -27,6 +27,8 @@ const products = [
     id: 'cashewnut-butter',
     name: 'Cashewnut Butter',
     image: 'nuts/cashewnut Butter .png',
+    // TODO: replace with real multi-angle / lifestyle photos once available
+    images: ['nuts/cashewnut Butter .png', 'nuts/cashewnut Butter .png', 'nuts/cashewnut Butter .png'],
     badge: 'Best Seller',
     description: 'Smooth, small-batch roasted cashew butter with no added oils or sugar. A rich, creamy spread that\'s just as good on toast as it is by the spoonful.',
     rating: 4.9,
@@ -46,6 +48,7 @@ const products = [
     id: 'roasted-peanuts',
     name: 'Roasted Peanuts',
     image: 'nuts/Roasted Peanuts .png',
+    images: ['nuts/Roasted Peanuts .png', 'nuts/Roasted Peanuts .png', 'nuts/Roasted Peanuts .png'],
     badge: 'Best Seller',
     description: 'Lightly salted, small-batch roasted peanuts with a satisfying crunch. No preservatives, no added oils, just the nut the way nature made it.',
     rating: 4.8,
@@ -65,6 +68,7 @@ const products = [
     id: 'sesame-brittles',
     name: 'Sesame Brittles',
     image: 'nuts/Sesame brittles.png',
+    images: ['nuts/Sesame brittles.png', 'nuts/Sesame brittles.png', 'nuts/Sesame brittles.png'],
     badge: 'Best Seller',
     description: 'Crunchy sesame brittles made with roasted sesame seeds and natural sweetener. Not overly sweet, and packaged to stay fresh for weeks.',
     rating: 4.9,
@@ -82,6 +86,7 @@ const products = [
     id: 'peanut-butter',
     name: 'Peanut Butter',
     image: 'nuts/Peanut Butter.png',
+    images: ['nuts/Peanut Butter.png', 'nuts/Peanut Butter.png', 'nuts/Peanut Butter.png'],
     badge: 'Best Seller',
     description: 'Classic small-batch roasted peanut butter, smooth and rich with zero added sugar. A pantry staple the whole family can enjoy.',
     rating: 4.7,
@@ -100,6 +105,7 @@ const products = [
 
 let activeProduct = null;
 let activeVariantIndex = 0;
+let activeGalleryIndex = 0;
 let modalQty = 1;
 
 /* ── STAR RATING RENDER ── */
@@ -148,18 +154,18 @@ function openProductModal(productId) {
 
   activeProduct = product;
   activeVariantIndex = 0;
+  activeGalleryIndex = 0;
   modalQty = 1;
 
   document.getElementById('modalBadge').style.display = product.badge ? 'inline-block' : 'none';
   document.getElementById('modalBadge').textContent = product.badge || '';
-  document.getElementById('modalImg').src = product.image;
-  document.getElementById('modalImg').alt = product.name;
   document.getElementById('modalName').textContent = product.name;
   document.getElementById('modalStars').textContent = renderStars(product.rating);
   document.getElementById('modalRatingCount').textContent = `${product.rating.toFixed(1)} (${product.reviewCount} reviews)`;
   document.getElementById('modalDesc').textContent = product.description;
   document.getElementById('modalQty').textContent = modalQty;
 
+  renderGallery();
   renderModalVariants();
   updateModalPrice();
   renderModalReviews();
@@ -171,6 +177,43 @@ function openProductModal(productId) {
 function closeProductModal() {
   document.getElementById('productModalOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+/* ── PRODUCT IMAGE GALLERY ── */
+function renderGallery() {
+  const images = activeProduct.images && activeProduct.images.length ? activeProduct.images : [activeProduct.image];
+
+  document.getElementById('modalImg').src = images[activeGalleryIndex];
+  document.getElementById('modalImg').alt = `${activeProduct.name} photo ${activeGalleryIndex + 1}`;
+
+  const thumbsEl = document.getElementById('galleryThumbs');
+  const arrows = document.querySelectorAll('.gallery-arrow');
+
+  if (images.length <= 1) {
+    thumbsEl.innerHTML = '';
+    thumbsEl.style.display = 'none';
+    arrows.forEach(a => a.style.display = 'none');
+    return;
+  }
+
+  thumbsEl.style.display = 'flex';
+  arrows.forEach(a => a.style.display = 'flex');
+  thumbsEl.innerHTML = images.map((src, i) => `
+    <button class="gallery-thumb ${i === activeGalleryIndex ? 'active' : ''}" onclick="selectGalleryImage(${i})">
+      <img src="${src}" alt="${activeProduct.name} thumbnail ${i + 1}" />
+    </button>
+  `).join('');
+}
+
+function selectGalleryImage(index) {
+  activeGalleryIndex = index;
+  renderGallery();
+}
+
+function changeGalleryImage(delta) {
+  const images = activeProduct.images && activeProduct.images.length ? activeProduct.images : [activeProduct.image];
+  activeGalleryIndex = (activeGalleryIndex + delta + images.length) % images.length;
+  renderGallery();
 }
 
 function renderModalVariants() {
