@@ -917,7 +917,7 @@ nav {
 /* ── CATEGORIES ── */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 .cat-card {
@@ -926,7 +926,7 @@ nav {
   padding: 18px 10px 14px;
   text-align: center;
   cursor: pointer;
-  transition: box-shadow .2s, transform .2s;
+  transition: box-shadow .2s, transform .2s, border-color .2s, background .2s;
   border: 1.5px solid transparent;
 }
 .cat-card:hover {
@@ -934,6 +934,14 @@ nav {
   box-shadow: 0 6px 20px rgba(44,31,15,.1);
   border-color: var(--gold-light);
 }
+.cat-card.active {
+  border-color: var(--brown-deep);
+  background: var(--white);
+  box-shadow: 0 6px 20px rgba(44,31,15,.12);
+}
+[data-theme="dark"] .cat-card.active { border-color: var(--gold); }
+.cat-card.active .cat-name { color: var(--gold); }
+.cat-card.active .cat-img { border-color: var(--gold); }
 .cat-img {
   width: 70px; height: 70px;
   border-radius: 50%;
@@ -953,7 +961,9 @@ nav {
   color: var(--brown-deep);
   line-height: 1.3;
   margin-bottom: 8px;
+  transition: color .2s;
 }
+[data-theme="dark"] .cat-name { color: var(--text-body); }
 .cat-arrow {
   width: 22px; height: 22px;
   background: var(--white);
@@ -968,6 +978,33 @@ nav {
   transition: transform .3s ease;
 }
 .cat-card:hover .cat-arrow { transform: translateX(4px); }
+
+/* ── ACTIVE CATEGORY FILTER CHIP ── */
+.category-filter-chip {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--white);
+  border: 1.5px solid var(--gold-light);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-top: 14px;
+  font-size: .8rem;
+  color: var(--text-body);
+}
+.category-filter-chip strong { color: var(--gold); }
+.category-filter-chip button {
+  background: var(--cream);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: background .2s;
+}
+.category-filter-chip button:hover { background: var(--cream-dark); }
 
 
 /* ── PRODUCTS ── */
