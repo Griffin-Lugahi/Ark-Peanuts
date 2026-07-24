@@ -239,42 +239,22 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
   <div id="categories">
     <div class="section-header">
       <h2 class="section-title">Shop by Category</h2>
-      <a href="#" class="view-all">View all →</a>
+      <a href="#" class="view-all" onclick="filterByCategory('all'); return false;">View all →</a>
     </div>
-    <div class="categories-grid reveal-stagger">
-      <div class="cat-card" onclick="showToast('Browsing Macadamia Nuts…')">
-        <img class="cat-img" src="https://images.unsplash.com/photo-1574570282374-43d57e1f5eb4?w=150&q=80" alt="Cashewnut Butter" />
-        <div class="cat-name">Cashewnut Butter</div>
-        <div class="cat-arrow">›</div>
-      </div>
-      <div class="cat-card" onclick="showToast('Browsing Peanuts…')">
-        <img class="cat-img" src="https://images.unsplash.com/photo-1567168544813-cc03465b4fa8?w=150&q=80" alt="Peanut Butter" />
-        <div class="cat-name">Peanut butter</div>
-        <div class="cat-arrow">›</div>
-      </div>
-      <div class="cat-card" onclick="showToast('Browsing Cashew Nuts…')">
-        <img class="cat-img" src="https://images.unsplash.com/photo-1536591375667-f1a0e9bd49c1?w=150&q=80" alt="Cashew" />
-        <div class="cat-name">Cashew Nuts</div>
-        <div class="cat-arrow">›</div>
-      </div>
-      <div class="cat-card" onclick="showToast('Browsing Almond Nuts…')">
-        <img class="cat-img" src="https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=150&q=80" alt="Peanut Floor" />
-        <div class="cat-name">Peanut Floor</div>
-        <div class="cat-arrow">›</div>
-      </div>
-      <div class="cat-card" onclick="showToast('Browsing Mixed Nuts…')">
-        <img class="cat-img" src="https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=150&q=80" alt="Cashew Nuts" />
-        <div class="cat-name">Cashew Nuts</div>
-        <div class="cat-arrow">›</div>
-      </div>
-    </div> 
+    <div class="categories-grid reveal-stagger" id="categoriesGrid">
+      <!-- Category cards are rendered here by index.js from the `categories` array -->
+    </div>
+    <div class="category-filter-chip" id="categoryFilterChip" style="display:none;">
+      <span>Showing: <strong id="categoryFilterLabel"></strong></span>
+      <button onclick="filterByCategory('all')">Clear ✕</button>
+    </div>
   </div>
 
   <!-- Best Sellers -->
   <div>
     <div class="section-header">
       <h2 class="section-title">Best Sellers</h2>
-      <a href="#" class="view-all">View all →</a>
+      <a href="#" class="view-all" onclick="filterByCategory('all'); return false;">View all →</a>
     </div>
     <div class="products-grid reveal-stagger" id="productsGrid">
       <!-- Product cards are rendered here by index.js from the `products` array -->
