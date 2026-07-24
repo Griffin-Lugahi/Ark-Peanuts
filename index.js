@@ -26,6 +26,7 @@ const products = [
   {
     id: 'cashewnut-butter',
     name: 'Cashewnut Butter',
+    category: 'butters',
     image: 'nuts/cashewnut Butter .png',
     // TODO: replace with real multi-angle / lifestyle photos once available
     images: ['nuts/cashewnut Butter .png', 'nuts/cashewnut Butter .png', 'nuts/cashewnut Butter .png'],
@@ -47,6 +48,7 @@ const products = [
   {
     id: 'roasted-peanuts',
     name: 'Roasted Peanuts',
+    category: 'peanuts',
     image: 'nuts/Roasted Peanuts .png',
     images: ['nuts/Roasted Peanuts .png', 'nuts/Roasted Peanuts .png', 'nuts/Roasted Peanuts .png'],
     badge: 'Best Seller',
@@ -67,6 +69,7 @@ const products = [
   {
     id: 'sesame-brittles',
     name: 'Sesame Brittles',
+    category: 'brittles',
     image: 'nuts/Sesame brittles.png',
     images: ['nuts/Sesame brittles.png', 'nuts/Sesame brittles.png', 'nuts/Sesame brittles.png'],
     badge: 'Best Seller',
@@ -85,6 +88,7 @@ const products = [
   {
     id: 'peanut-butter',
     name: 'Peanut Butter',
+    category: 'butters',
     image: 'nuts/Peanut Butter.png',
     images: ['nuts/Peanut Butter.png', 'nuts/Peanut Butter.png', 'nuts/Peanut Butter.png'],
     badge: 'Best Seller',
@@ -103,6 +107,84 @@ const products = [
   }
 ];
 
+/* ── CATEGORIES (derived from real product data, not placeholders) ── */
+const categories = [
+  { id: 'all', name: 'All Products' },
+  { id: 'butters', name: 'Nut Butters' },
+  { id: 'peanuts', name: 'Roasted Peanuts' },
+  { id: 'brittles', name: 'Brittles' }
+];
+
+function categoryThumbnail(categoryId) {
+  if (categoryId === 'all') return products[0].image;
+  const match = products.find(p => p.category === categoryId);
+  return match ? match.image : products[0].image;
+}
+
+let activeCategory = 'all';
+
+/* ── RENDER CATEGORY CARDS ── */
+function renderCategoryCards() {
+  const grid = document.getElementById('categoriesGrid');
+  if (!grid) return;
+
+  grid.innerHTML = categories.map(c => `
+    <div class="cat-card ${c.id === activeCategory ? 'active' : ''}" data-category-id="${c.id}" onclick="filterByCategory('${c.id}')">
+      <img class="cat-img" src="${categoryThumbnail(c.id)}" alt="${c.name}" />
+      <div class="cat-name">${c.name}</div>
+      <div class="cat-arrow">›</div>
+    </div>
+  `).join('');
+}
+
+/* ── FILTER PRODUCTS BY CATEGORY (composes with the text search filter) ── */
+function filterByCategory(categoryId) {
+  activeCategory = categoryId;
+
+  document.querySelectorAll('.cat-card').forEach(card => {
+    card.classList.toggle('active', card.dataset.categoryId === categoryId);
+  });
+
+  const chip = document.getElementById('categoryFilterChip');
+  if (categoryId === 'all') {
+    chip.style.display = 'none';
+  } else {
+    chip.style.display = 'flex';
+    document.getElementById('categoryFilterLabel').textContent =
+      categories.find(c => c.id === categoryId)?.name || categoryId;
+  }
+
+  applyFilters();
+  document.getElementById('shop').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── COMBINED CATEGORY + SEARCH FILTER ── */
+function applyFilters() {
+  const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  let visibleCount = 0;
+
+  document.querySelectorAll('.product-card').forEach(card => {
+    const nameEl = card.querySelector('.product-name');
+    const text = nameEl ? nameEl.textContent.toLowerCase() : '';
+    const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+    const matchesSearch = query === '' || text.includes(query);
+    const isVisible = matchesCategory && matchesSearch;
+    card.style.display = isVisible ? '' : 'none';
+    if (isVisible) visibleCount++;
+  });
+
+  const emptyState = document.getElementById('searchEmptyState');
+  const emptyQuery = document.getElementById('searchEmptyQuery');
+  if (visibleCount === 0) {
+    emptyState.style.display = 'flex';
+    emptyQuery.textContent = query || (categories.find(c => c.id === activeCategory)?.name ?? '');
+  } else {
+    emptyState.style.display = 'none';
+  }
+
+  return visibleCount;
+}
+
 let activeProduct = null;
 let activeVariantIndex = 0;
 let activeGalleryIndex = 0;
@@ -120,7 +202,7 @@ function renderProductCards() {
   if (!grid) return;
 
   grid.innerHTML = products.map(p => `
-    <div class="product-card" onclick="openProductModal('${p.id}')">
+    <div class="product-card" data-category="${p.category}" onclick="openProductModal('${p.id}')">
       ${p.badge ? `<span class="best-badge">${p.badge}</span>` : ''}
       <img class="product-img" src="${p.image}" alt="${p.name}" />
       <div class="product-info">
@@ -495,6 +577,7 @@ function renderOrderHistory() {
 document.getElementById('ordersBtn').addEventListener('click', openOrdersModal);
 
 let cart = [];
+renderCategoryCards();
 renderProductCards();
 
 /* ── CART OPEN / CLOSE ── */
@@ -654,37 +737,13 @@ function closeSearch() {
   searchInput.value = '';
 }
 
-/* ── PRODUCT SEARCH / FILTER ── */
+/* ── PRODUCT SEARCH / FILTER (composes with category filter via applyFilters) ── */
 function performProductSearch(query) {
-  const q = query.trim().toLowerCase();
-  let matches = 0;
-
-  function filterCards(selector, nameSelector) {
-    document.querySelectorAll(selector).forEach(card => {
-      const nameEl = card.querySelector(nameSelector);
-      const text = nameEl ? nameEl.textContent.toLowerCase() : '';
-      const isMatch = q === '' || text.includes(q);
-      card.style.display = isMatch ? '' : 'none';
-      if (isMatch && q !== '') matches++;
-    });
-  }
-
-  filterCards('.cat-card', '.cat-name');
-  filterCards('.product-card', '.product-name');
-
-  const emptyState = document.getElementById('searchEmptyState');
-  const emptyQuery = document.getElementById('searchEmptyQuery');
-  if (q !== '' && matches === 0) {
-    emptyState.style.display = 'flex';
-    emptyQuery.textContent = query.trim();
-  } else {
-    emptyState.style.display = 'none';
-  }
-
-  return matches;
+  return applyFilters();
 }
 
 function clearProductSearch() {
+  searchInput.value = '';
   performProductSearch('');
   showToast('Showing all products');
 }
