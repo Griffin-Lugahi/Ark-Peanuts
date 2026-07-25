@@ -3,7 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arkpeanuts</title>
+  <title>Ark Peanuts | Premium All-Natural Nuts, Butters &amp; Brittles in Kenya</title>
+  <meta name="description" content="Ark Peanuts sells premium, all-natural roasted nuts, nut butters, and brittles sourced from local Kenyan farms. No additives, no preservatives, delivered fresh nationwide." />
+  <meta name="keywords" content="peanuts Kenya, roasted nuts, nut butter, cashew butter, peanut butter, sesame brittle, Nairobi snacks, natural snacks Kenya" />
+  <link rel="canonical" href="https://arkpeanuts.co.ke/" />
+
+  <!-- Open Graph / Facebook, WhatsApp -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ark Peanuts" />
+  <meta property="og:title" content="Ark Peanuts | Premium All-Natural Nuts, Butters & Brittles" />
+  <meta property="og:description" content="All-natural, addictive-free nuts, butters, and brittles sourced from local Kenyan farms. No additives, no preservatives, just the way nature intended." />
+  <meta property="og:image" content="https://arkpeanuts.co.ke/logo/Arkpeanuts-hero-section-img.png" />
+  <meta property="og:url" content="https://arkpeanuts.co.ke/" />
+  <meta property="og:locale" content="en_KE" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ark Peanuts | Premium All-Natural Nuts, Butters & Brittles" />
+  <meta name="twitter:description" content="All-natural, addictive-free nuts, butters, and brittles sourced from local Kenyan farms." />
+  <meta name="twitter:image" content="https://arkpeanuts.co.ke/logo/Arkpeanuts-hero-section-img.png" />
+
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="alternate icon" href="favicon.svg" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Pacifico&family=Poppins:wght@600&display=swap" rel="stylesheet" />
@@ -113,7 +132,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 </nav>
 
 <div class="search-overlay" id="searchOverlay">
-  <div class="search-box">
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search products" tabindex="-1">
     <input type="text" id="searchInput" placeholder="Search for nuts, butter, brittles…" autocomplete="off" />
     <button id="searchCloseBtn" aria-label="Close search">✕</button>
   </div>
@@ -121,7 +140,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 <!-- ── ACCOUNT MODAL ── -->
 <div class="account-overlay" id="accountOverlay">
-  <div class="account-box">
+  <div class="account-box" role="dialog" aria-modal="true" aria-label="Account login and sign up" tabindex="-1">
     <button class="account-close" id="accountCloseBtn" aria-label="Close account panel">✕</button>
 
     <div class="account-tabs">
@@ -265,7 +284,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 <!-- ── PRODUCT DETAIL MODAL ── -->
 <div class="product-modal-overlay" id="productModalOverlay" onclick="if(event.target===this) closeProductModal()">
-  <div class="product-modal" id="productModal">
+  <div class="product-modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalName" tabindex="-1">
     <button class="product-modal-close" onclick="closeProductModal()" aria-label="Close">✕</button>
 
     <div class="product-modal-grid">
@@ -318,7 +337,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 <!-- ── CHECKOUT MODAL ── -->
 <div class="product-modal-overlay" id="checkoutOverlay" onclick="if(event.target===this) closeCheckoutModal()">
-  <div class="checkout-modal" id="checkoutModal">
+  <div class="checkout-modal" id="checkoutModal" role="dialog" aria-modal="true" aria-label="Checkout" tabindex="-1">
     <button class="product-modal-close" onclick="closeCheckoutModal()" aria-label="Close">✕</button>
 
     <!-- Form view -->
@@ -421,7 +440,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 <!-- ── ORDER HISTORY / TRACKING MODAL ── -->
 <div class="product-modal-overlay" id="ordersOverlay" onclick="if(event.target===this) closeOrdersModal()">
-  <div class="orders-modal" id="ordersModal">
+  <div class="orders-modal" id="ordersModal" role="dialog" aria-modal="true" aria-label="My Orders" tabindex="-1">
     <button class="product-modal-close" onclick="closeOrdersModal()" aria-label="Close">✕</button>
     <h2 class="checkout-title">My Orders</h2>
     <p class="orders-subtitle">Orders placed from this browser. Track delivery progress below.</p>
@@ -930,7 +949,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 
 <!-- ── CART PANEL ── -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
-<div class="cart-panel" id="cartPanel">
+<div class="cart-panel" id="cartPanel" role="dialog" aria-modal="true" aria-label="Shopping cart" tabindex="-1">
   <div class="cart-head">
     <h3>Your Cart</h3>
     <button class="cart-close" onclick="closeCart()">✕</button>
@@ -948,7 +967,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
 </div>
 
 <!-- ── TOAST ── -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ── FLOATING WHATSAPP BUTTON ── -->
 <a
