@@ -2403,8 +2403,22 @@ footer {
   font-size: .8rem;
   color: rgba(255,255,255,.65);
   transition: color .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 .footer-col a:hover { color: var(--gold-light); }
+.footer-link-soon { cursor: pointer; }
+.soon-badge {
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--brown-deep);
+  background: var(--gold-light);
+  padding: 2px 7px;
+  border-radius: 20px;
+}
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,.1);
   padding-top: 20px;
