@@ -21,6 +21,57 @@ document.getElementById('themeToggleBtn').addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
+/* ── ACCESSIBILITY: FOCUS TRAP FOR MODALS/PANELS ──
+   Keeps keyboard focus inside the open modal (Tab cycles within it instead of
+   escaping to the page behind), and returns focus to whatever triggered the
+   modal once it closes — standard expected behavior for dialogs. */
+let a11yLastFocused = null;
+let a11yActiveModal = null;
+
+function a11yGetFocusable(container) {
+  return Array.from(container.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter(el => el.offsetParent !== null);
+}
+
+function a11yTrapHandler(e) {
+  if (e.key !== 'Tab' || !a11yActiveModal) return;
+  const focusable = a11yGetFocusable(a11yActiveModal);
+  if (focusable.length === 0) {
+    e.preventDefault();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+function a11yActivate(modalEl) {
+  a11yLastFocused = document.activeElement;
+  a11yActiveModal = modalEl;
+  document.addEventListener('keydown', a11yTrapHandler);
+  setTimeout(() => {
+    const focusable = a11yGetFocusable(modalEl);
+    (focusable[0] || modalEl).focus();
+  }, 60); // let the open transition/render finish first
+}
+
+function a11yDeactivate() {
+  document.removeEventListener('keydown', a11yTrapHandler);
+  a11yActiveModal = null;
+  if (a11yLastFocused && typeof a11yLastFocused.focus === 'function') {
+    a11yLastFocused.focus();
+  }
+  a11yLastFocused = null;
+}
+
 /* ── PRODUCT DATA (single source of truth for cards, modal, and cart) ── */
 const products = [
   {
@@ -254,11 +305,13 @@ function openProductModal(productId) {
 
   document.getElementById('productModalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  a11yActivate(document.getElementById('productModal'));
 }
 
 function closeProductModal() {
   document.getElementById('productModalOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (a11yActiveModal === document.getElementById('productModal')) a11yDeactivate();
 }
 
 /* ── PRODUCT IMAGE GALLERY ── */
@@ -378,11 +431,13 @@ function openCheckoutModal() {
   renderCheckoutSummary();
   document.getElementById('checkoutOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  a11yActivate(document.getElementById('checkoutModal'));
 }
 
 function closeCheckoutModal() {
   document.getElementById('checkoutOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (a11yActiveModal === document.getElementById('checkoutModal')) a11yDeactivate();
 }
 
 function calcDeliveryFee(subtotal) {
@@ -506,10 +561,12 @@ function openOrdersModal() {
   renderOrderHistory();
   document.getElementById('ordersOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  a11yActivate(document.getElementById('ordersModal'));
 }
 function closeOrdersModal() {
   document.getElementById('ordersOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (a11yActiveModal === document.getElementById('ordersModal')) a11yDeactivate();
 }
 
 function renderOrderHistory() {
@@ -576,9 +633,25 @@ function renderOrderHistory() {
 
 document.getElementById('ordersBtn').addEventListener('click', openOrdersModal);
 
-let cart = [];
+/* ── CART PERSISTENCE ── */
+const CART_KEY = 'arkpeanuts_cart';
+
+function loadCart() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(CART_KEY));
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    return [];
+  }
+}
+function persistCart() {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+let cart = loadCart();
 renderCategoryCards();
 renderProductCards();
+updateCart(); // reflect any cart restored from a previous visit
 
 /* ── CART OPEN / CLOSE ── */
 document.getElementById('cartBtn').addEventListener('click', openCart);
@@ -586,11 +659,13 @@ document.getElementById('cartBtn').addEventListener('click', openCart);
 function openCart() {
   document.getElementById('cartOverlay').classList.add('open');
   document.getElementById('cartPanel').classList.add('open');
+  a11yActivate(document.getElementById('cartPanel'));
 }
 
 function closeCart() {
   document.getElementById('cartOverlay').classList.remove('open');
   document.getElementById('cartPanel').classList.remove('open');
+  if (a11yActiveModal === document.getElementById('cartPanel')) a11yDeactivate();
 }
 
 /* ── ADD TO CART ── */
@@ -632,6 +707,8 @@ function changeQty(name, delta) {
 
 /* ── RENDER CART ── */
 function updateCart() {
+  persistCart();
+
   const count = cart.reduce((a, i) => a + i.qty, 0);
   const countEl = document.getElementById('cartCount');
   countEl.textContent = count;
@@ -708,6 +785,7 @@ const searchInput   = document.getElementById('searchInput');
 
 document.getElementById('searchBtn').addEventListener('click', () => {
   searchOverlay.classList.add('open');
+  a11yActivate(document.querySelector('.search-box'));
   setTimeout(() => searchInput.focus(), 100);
 });
 document.getElementById('searchCloseBtn').addEventListener('click', closeSearch);
@@ -735,6 +813,7 @@ searchInput.addEventListener('keydown', (e) => {
 function closeSearch() {
   searchOverlay.classList.remove('open');
   searchInput.value = '';
+  if (a11yActiveModal === document.querySelector('.search-box')) a11yDeactivate();
 }
 
 /* ── PRODUCT SEARCH / FILTER (composes with category filter via applyFilters) ── */
@@ -796,9 +875,11 @@ function openAccountModal() {
   document.getElementById('loginError').textContent = '';
   document.getElementById('signupError').textContent = '';
   accountOverlay.classList.add('open');
+  a11yActivate(document.querySelector('.account-box'));
 }
 function closeAccountModal() {
   accountOverlay.classList.remove('open');
+  if (a11yActiveModal === document.querySelector('.account-box')) a11yDeactivate();
 }
 function switchAccountTab(tab) {
   const isLogin = tab === 'login';
