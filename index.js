@@ -852,6 +852,50 @@ async function hashPassword(password, salt) {
   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+/* ── LOGIN RATE LIMITING ──
+   Tracked client-side per email, in localStorage. This is a UX-level
+   deterrent against casual repeated guessing, not real brute-force
+   protection: anyone can clear localStorage or use a different browser
+   to reset it. Genuine rate limiting needs to happen server-side. */
+const LOGIN_ATTEMPTS_KEY = 'arkpeanuts_login_attempts';
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOGIN_LOCKOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+function getLoginAttempts() {
+  try {
+    return JSON.parse(localStorage.getItem(LOGIN_ATTEMPTS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+function saveLoginAttempts(attempts) {
+  localStorage.setItem(LOGIN_ATTEMPTS_KEY, JSON.stringify(attempts));
+}
+function getAttemptRecord(email) {
+  return getLoginAttempts()[email] || { count: 0, lockedUntil: 0 };
+}
+function recordFailedAttempt(email) {
+  const attempts = getLoginAttempts();
+  const record = attempts[email] || { count: 0, lockedUntil: 0 };
+  record.count += 1;
+  if (record.count >= MAX_LOGIN_ATTEMPTS) {
+    record.lockedUntil = Date.now() + LOGIN_LOCKOUT_MS;
+    record.count = 0;
+  }
+  attempts[email] = record;
+  saveLoginAttempts(attempts);
+  return record;
+}
+function clearLoginAttempts(email) {
+  const attempts = getLoginAttempts();
+  delete attempts[email];
+  saveLoginAttempts(attempts);
+}
+function formatLockoutRemaining(lockedUntil) {
+  const mins = Math.ceil((lockedUntil - Date.now()) / 60000);
+  return mins <= 1 ? 'less than a minute' : `${mins} minutes`;
+}
+
 function getAccounts() {
   try {
     return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || [];
@@ -943,20 +987,29 @@ async function handleLogin(e) {
   const password = document.getElementById('loginPassword').value;
   const errorEl  = document.getElementById('loginError');
 
+  const existingRecord = getAttemptRecord(email);
+  if (existingRecord.lockedUntil && existingRecord.lockedUntil > Date.now()) {
+    errorEl.textContent = `Too many failed attempts. Try again in ${formatLockoutRemaining(existingRecord.lockedUntil)}.`;
+    return;
+  }
+
   const accounts = getAccounts();
   const account = accounts.find(a => a.email === email);
+  const attemptedHash = account ? await hashPassword(password, account.salt) : null;
+  const success = !!account && attemptedHash === account.passwordHash;
 
-  if (!account) {
-    errorEl.textContent = 'Incorrect email or password.';
+  if (!success) {
+    const record = recordFailedAttempt(email);
+    if (record.lockedUntil && record.lockedUntil > Date.now()) {
+      errorEl.textContent = `Too many failed attempts. Try again in ${formatLockoutRemaining(record.lockedUntil)}.`;
+    } else {
+      const remaining = MAX_LOGIN_ATTEMPTS - record.count;
+      errorEl.textContent = `Incorrect email or password. ${remaining} attempt${remaining === 1 ? '' : 's'} left before temporary lockout.`;
+    }
     return;
   }
 
-  const attemptedHash = await hashPassword(password, account.salt);
-  if (attemptedHash !== account.passwordHash) {
-    errorEl.textContent = 'Incorrect email or password.';
-    return;
-  }
-
+  clearLoginAttempts(email);
   setCurrentUser({ name: account.name, email: account.email });
   closeAccountModal();
   loginForm.reset();
