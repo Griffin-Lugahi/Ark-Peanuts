@@ -827,9 +827,30 @@ function clearProductSearch() {
   showToast('Showing all products');
 }
 
-/* ── ACCOUNT SYSTEM (front-end only, stored in localStorage) ── */
+/* ── ACCOUNT SYSTEM (front-end only, stored in localStorage) ──
+   SECURITY NOTE: passwords are hashed (SHA-256 + per-account random salt)
+   before being stored, so raw passwords are never sitting in localStorage.
+   This stops casual DevTools inspection from exposing real passwords, but
+   it is NOT equivalent to real server-side auth: the hashing logic itself
+   is visible in this file, there's no rate-limiting on login attempts, and
+   anyone with access to this browser's storage still controls the account.
+   True security requires a backend with server-side hashing (bcrypt/argon2)
+   and proper session management. Also requires a secure context (HTTPS or
+   localhost) since it relies on the Web Crypto API. */
 const ACCOUNTS_KEY = 'arkpeanuts_accounts';
 const SESSION_KEY   = 'arkpeanuts_current_user';
+
+function generateSalt() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hashPassword(password, salt) {
+  const data = new TextEncoder().encode(`${salt}:${password}`);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 function getAccounts() {
   try {
@@ -889,7 +910,7 @@ function switchAccountTab(tab) {
   signupTabBtn.classList.toggle('active', !isLogin);
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
   e.preventDefault();
   const name     = document.getElementById('signupName').value.trim();
   const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
@@ -902,7 +923,10 @@ function handleSignup(e) {
     return;
   }
 
-  const newAccount = { name, email, password };
+  const salt = generateSalt();
+  const passwordHash = await hashPassword(password, salt);
+
+  const newAccount = { name, email, passwordHash, salt };
   accounts.push(newAccount);
   saveAccounts(accounts);
   setCurrentUser({ name, email });
@@ -913,25 +937,31 @@ function handleSignup(e) {
   showToast(`Welcome, ${name}! 🥜`);
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
   const errorEl  = document.getElementById('loginError');
 
   const accounts = getAccounts();
-  const match = accounts.find(a => a.email === email && a.password === password);
+  const account = accounts.find(a => a.email === email);
 
-  if (!match) {
+  if (!account) {
     errorEl.textContent = 'Incorrect email or password.';
     return;
   }
 
-  setCurrentUser({ name: match.name, email: match.email });
+  const attemptedHash = await hashPassword(password, account.salt);
+  if (attemptedHash !== account.passwordHash) {
+    errorEl.textContent = 'Incorrect email or password.';
+    return;
+  }
+
+  setCurrentUser({ name: account.name, email: account.email });
   closeAccountModal();
   loginForm.reset();
   refreshAccountUI();
-  showToast(`Welcome back, ${match.name}! 🥜`);
+  showToast(`Welcome back, ${account.name}! 🥜`);
 }
 
 function handleLogout() {
