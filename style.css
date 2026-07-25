@@ -75,6 +75,29 @@
 
 html { scroll-behavior: smooth; }
 
+/* ── ACCESSIBILITY: VISIBLE FOCUS OUTLINE ──
+   Only shows for keyboard navigation (:focus-visible), not mouse clicks,
+   so it doesn't clutter the UI for mouse/touch users while still giving
+   keyboard users a clear indicator of where focus is. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2.5px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.product-modal:focus-visible,
+.checkout-modal:focus-visible,
+.orders-modal:focus-visible,
+.account-box:focus-visible,
+.search-box:focus-visible,
+.cart-panel:focus-visible {
+  outline: none; /* the modal container itself gets programmatic focus as a fallback; no ring needed on the whole panel */
+}
+
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(26px); }
