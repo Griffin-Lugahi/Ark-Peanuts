@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arkpeanuts.co.ke/sitemap.xml
