@@ -153,6 +153,9 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
  <div class="nav-actions">
   <button aria-label="Toggle dark mode" id="themeToggleBtn">🌙</button>
   <button aria-label="Search" id="searchBtn">🔍</button>
+  <button aria-label="Wishlist" id="wishlistBtn" style="position:relative;">
+    ♡<span class="cart-badge" id="wishlistCount">0</span>
+  </button>
   <button aria-label="My Orders" id="ordersBtn">📦</button>
   <button aria-label="Account" id="accountBtn">👤</button>
   <button aria-label="Cart" id="cartBtn" style="position:relative;">
@@ -279,6 +282,7 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
       loading="eager"
       fetchpriority="high"
       decoding="async"
+      onerror="handleImgError(this)"
     />
   </div>
 </section>
@@ -329,13 +333,16 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
       <div class="product-modal-media">
         <span class="best-badge" id="modalBadge">Best Seller</span>
         <button class="gallery-arrow gallery-arrow-prev" onclick="changeGalleryImage(-1)" aria-label="Previous photo">‹</button>
-        <img id="modalImg" class="product-modal-img" src="" alt="" loading="lazy" decoding="async" />
+        <img id="modalImg" class="product-modal-img" src="" alt="" loading="lazy" decoding="async" onerror="handleImgError(this)" />
         <button class="gallery-arrow gallery-arrow-next" onclick="changeGalleryImage(1)" aria-label="Next photo">›</button>
         <div class="gallery-thumbs" id="galleryThumbs"></div>
       </div>
 
       <div class="product-modal-info">
-        <h2 class="product-modal-name" id="modalName"></h2>
+        <div class="product-modal-name-row">
+          <h2 class="product-modal-name" id="modalName"></h2>
+          <button class="wishlist-heart-btn wishlist-heart-btn-modal" id="modalWishlistBtn" onclick="toggleWishlist(activeProduct.id)" aria-label="Toggle wishlist">♡</button>
+        </div>
         <div class="product-modal-rating">
           <span class="stars" id="modalStars"></span>
           <span class="rating-count" id="modalRatingCount"></span>
@@ -497,11 +504,28 @@ c-16 -14 -33 -36 -36 -50 -10 -39 17 -89 57 -109 33 -15 40 -15 72 -2 48 20
   </div>
 </div>
 
+<!-- ── WISHLIST MODAL ── -->
+<div class="product-modal-overlay" id="wishlistOverlay" onclick="if(event.target===this) closeWishlistModal()">
+  <div class="orders-modal" id="wishlistModal" role="dialog" aria-modal="true" aria-label="Wishlist" tabindex="-1">
+    <button class="product-modal-close" onclick="closeWishlistModal()" aria-label="Close">✕</button>
+    <h2 class="checkout-title">My Wishlist</h2>
+    <p class="orders-subtitle">Saved items from this browser.</p>
+
+    <div id="wishlistList" class="orders-list"></div>
+
+    <div id="wishlistEmpty" class="orders-empty" style="display:none;">
+      <span style="font-size:2rem;">♡</span>
+      <p>Your wishlist is empty.</p>
+      <button class="btn-primary" onclick="closeWishlistModal()">START SHOPPING →</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── ABOUT US ── -->
 <section class="about-section reveal" id="about">
   <div class="about-grid">
     <div class="about-image">
-      <img src="logo/Arkpeanuts-hero-section-img.png" alt="Ark Peanuts farm sourcing" loading="lazy" decoding="async" />
+      <img src="logo/Arkpeanuts-hero-section-img.png" alt="Ark Peanuts farm sourcing" loading="lazy" decoding="async" onerror="handleImgError(this)" />
       <div class="about-badge">
         <strong>10+</strong>
         <span>Years Roasting</span>
