@@ -181,7 +181,7 @@ function renderCategoryCards() {
 
   grid.innerHTML = categories.map(c => `
     <div class="cat-card ${c.id === activeCategory ? 'active' : ''}" data-category-id="${c.id}" onclick="filterByCategory('${c.id}')">
-      <img class="cat-img" src="${categoryThumbnail(c.id)}" alt="${c.name}" />
+      <img class="cat-img" src="${categoryThumbnail(c.id)}" alt="${c.name}" loading="lazy" decoding="async" />
       <div class="cat-name">${c.name}</div>
       <div class="cat-arrow">›</div>
     </div>
@@ -255,7 +255,7 @@ function renderProductCards() {
   grid.innerHTML = products.map(p => `
     <div class="product-card" data-category="${p.category}" onclick="openProductModal('${p.id}')">
       ${p.badge ? `<span class="best-badge">${p.badge}</span>` : ''}
-      <img class="product-img" src="${p.image}" alt="${p.name}" />
+      <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy" decoding="async" />
       <div class="product-info">
         <div class="product-name">${p.name}</div>
         <div class="product-card-rating">
@@ -335,7 +335,7 @@ function renderGallery() {
   arrows.forEach(a => a.style.display = 'flex');
   thumbsEl.innerHTML = images.map((src, i) => `
     <button class="gallery-thumb ${i === activeGalleryIndex ? 'active' : ''}" onclick="selectGalleryImage(${i})">
-      <img src="${src}" alt="${activeProduct.name} thumbnail ${i + 1}" />
+      <img src="${src}" alt="${activeProduct.name} thumbnail ${i + 1}" loading="lazy" decoding="async" />
     </button>
   `).join('');
 }
