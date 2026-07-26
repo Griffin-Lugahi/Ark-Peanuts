@@ -649,8 +649,52 @@ function persistCart() {
 }
 
 let cart = loadCart();
+/* ── STRUCTURED DATA (Product schema, generated from the same `products`
+   array that drives the cards/modal — so it can never drift out of sync) ── */
+function injectProductStructuredData() {
+  const siteUrl = 'https://arkpeanuts.co.ke'; // TODO: replace with your real live domain
+
+  const graph = products.map(p => ({
+    '@type': 'Product',
+    '@id': `${siteUrl}/#product-${p.id}`,
+    name: p.name,
+    image: (p.images && p.images.length ? p.images : [p.image]).map(src => `${siteUrl}/${src}`),
+    description: p.description,
+    brand: { '@type': 'Brand', name: 'Ark Peanuts' },
+    sku: p.id,
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'KES',
+      lowPrice: Math.min(...p.variants.map(v => v.price)),
+      highPrice: Math.max(...p.variants.map(v => v.price)),
+      offerCount: p.variants.length,
+      availability: 'https://schema.org/InStock',
+      url: `${siteUrl}/#shop`
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: p.rating,
+      reviewCount: p.reviewCount,
+      bestRating: 5,
+      worstRating: 1
+    },
+    review: p.reviews.map(r => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.name },
+      reviewRating: { '@type': 'Rating', ratingValue: r.stars, bestRating: 5 },
+      reviewBody: r.text
+    }))
+  }));
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+  document.head.appendChild(script);
+}
+
 renderCategoryCards();
 renderProductCards();
+injectProductStructuredData();
 updateCart(); // reflect any cart restored from a previous visit
 
 /* ── CART OPEN / CLOSE ── */
