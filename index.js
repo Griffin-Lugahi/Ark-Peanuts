@@ -485,8 +485,50 @@ function generateOrderNumber() {
   return 'AP-' + Date.now().toString().slice(-6) + random;
 }
 
+/* ── CHECKOUT FIELD VALIDATION ──
+   Kenyan mobile numbers: 07XXXXXXXX / 01XXXXXXXX, or with country code
+   as +2547XXXXXXXX / 2547XXXXXXXX (same for the 01 prefix). Delivery
+   depends on this number being real and reachable, so we check the shape
+   rather than just "not empty". */
+function isValidKenyanPhone(value) {
+  const cleaned = value.replace(/[\s-]/g, '');
+  return /^(?:\+254|254|0)(7\d{8}|1\d{8})$/.test(cleaned);
+}
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+}
+
+function validateCheckoutField(input, type) {
+  const value = input.value.trim();
+  const errorEl = document.getElementById(type === 'phone' ? 'checkoutPhoneError' : 'checkoutEmailError');
+  let message = '';
+
+  if (value !== '') {
+    if (type === 'phone' && !isValidKenyanPhone(value)) {
+      message = 'Enter a valid Kenyan number, e.g. 07XX XXX XXX or +2547XX XXX XXX';
+    } else if (type === 'email' && !isValidEmail(value)) {
+      message = 'Enter a valid email address, e.g. you@example.com';
+    }
+  }
+
+  errorEl.textContent = message;
+  input.classList.toggle('invalid', message !== '');
+  return message === '';
+}
+
 function submitCheckout(e) {
   e.preventDefault();
+
+  const phoneInput = document.getElementById('checkoutPhone');
+  const emailInput = document.getElementById('checkoutEmail');
+  const phoneValid = validateCheckoutField(phoneInput, 'phone') && phoneInput.value.trim() !== '';
+  const emailValid = validateCheckoutField(emailInput, 'email') && emailInput.value.trim() !== '';
+
+  if (!phoneValid || !emailValid) {
+    (phoneValid ? emailInput : phoneInput).focus();
+    showToast('Please fix the highlighted fields before continuing');
+    return;
+  }
 
   const name = document.getElementById('checkoutName').value.trim();
   const orderNumber = generateOrderNumber();
@@ -499,8 +541,8 @@ function submitCheckout(e) {
     orderNumber,
     timestamp: Date.now(),
     customerName: name,
-    customerEmail: document.getElementById('checkoutEmail').value.trim(),
-    customerPhone: document.getElementById('checkoutPhone').value.trim(),
+    customerEmail: emailInput.value.trim(),
+    customerPhone: phoneInput.value.trim(),
     address: document.getElementById('checkoutAddress').value.trim(),
     city,
     paymentMethod,
@@ -519,6 +561,10 @@ function submitCheckout(e) {
   cart = [];
   updateCart();
   document.getElementById('checkoutForm').reset();
+  document.getElementById('checkoutPhoneError').textContent = '';
+  document.getElementById('checkoutEmailError').textContent = '';
+  phoneInput.classList.remove('invalid');
+  emailInput.classList.remove('invalid');
   setPaymentMethod(document.querySelector('input[name="payment"][value="mpesa"]'));
 }
 
