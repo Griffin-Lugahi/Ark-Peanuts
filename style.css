@@ -1482,6 +1482,19 @@ nav {
 }
 .checkout-form-col select:focus { border-color: var(--gold); }
 
+.field-error {
+  font-size: .72rem;
+  color: #b3402a;
+  min-height: 1em;
+  margin-top: -2px;
+}
+.form-field input.invalid {
+  border-color: #b3402a;
+}
+.form-field input.invalid:focus {
+  border-color: #b3402a;
+}
+
 .payment-options {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
