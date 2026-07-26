@@ -72,6 +72,21 @@ function a11yDeactivate() {
   a11yLastFocused = null;
 }
 
+/* ── IMAGE FALLBACK ──
+   If a product/category photo fails to load (wrong path, renamed file, a
+   filename with a trailing space behaving oddly on a case-sensitive host,
+   etc.), show a neutral placeholder instead of a broken-image icon. */
+const IMG_FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+  '<rect width="200" height="200" fill="#e8dcc8"/>' +
+  '<text x="50%" y="50%" font-size="48" text-anchor="middle" dominant-baseline="middle">🥜</text>' +
+  '</svg>'
+);
+function handleImgError(img) {
+  img.onerror = null; // prevent any loop if the fallback itself somehow fails
+  img.src = IMG_FALLBACK;
+}
+
 /* ── PRODUCT DATA (single source of truth for cards, modal, and cart) ── */
 const products = [
   {
@@ -181,7 +196,7 @@ function renderCategoryCards() {
 
   grid.innerHTML = categories.map(c => `
     <div class="cat-card ${c.id === activeCategory ? 'active' : ''}" data-category-id="${c.id}" onclick="filterByCategory('${c.id}')">
-      <img class="cat-img" src="${categoryThumbnail(c.id)}" alt="${c.name}" loading="lazy" decoding="async" />
+      <img class="cat-img" src="${categoryThumbnail(c.id)}" alt="${c.name}" loading="lazy" decoding="async" onerror="handleImgError(this)" />
       <div class="cat-name">${c.name}</div>
       <div class="cat-arrow">›</div>
     </div>
@@ -253,9 +268,10 @@ function renderProductCards() {
   if (!grid) return;
 
   grid.innerHTML = products.map(p => `
-    <div class="product-card" data-category="${p.category}" onclick="openProductModal('${p.id}')">
+    <div class="product-card" data-category="${p.category}" data-product-id="${p.id}" onclick="openProductModal('${p.id}')">
       ${p.badge ? `<span class="best-badge">${p.badge}</span>` : ''}
-      <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy" decoding="async" />
+      <button class="wishlist-heart-btn ${isWishlisted(p.id) ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${p.id}')" aria-label="Toggle wishlist">${isWishlisted(p.id) ? '♥' : '♡'}</button>
+      <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy" decoding="async" onerror="handleImgError(this)" />
       <div class="product-info">
         <div class="product-name">${p.name}</div>
         <div class="product-card-rating">
@@ -298,6 +314,10 @@ function openProductModal(productId) {
   document.getElementById('modalDesc').textContent = product.description;
   document.getElementById('modalQty').textContent = modalQty;
 
+  const modalHeart = document.getElementById('modalWishlistBtn');
+  modalHeart.classList.toggle('active', isWishlisted(product.id));
+  modalHeart.textContent = isWishlisted(product.id) ? '♥' : '♡';
+
   renderGallery();
   renderModalVariants();
   updateModalPrice();
@@ -335,7 +355,7 @@ function renderGallery() {
   arrows.forEach(a => a.style.display = 'flex');
   thumbsEl.innerHTML = images.map((src, i) => `
     <button class="gallery-thumb ${i === activeGalleryIndex ? 'active' : ''}" onclick="selectGalleryImage(${i})">
-      <img src="${src}" alt="${activeProduct.name} thumbnail ${i + 1}" loading="lazy" decoding="async" />
+      <img src="${src}" alt="${activeProduct.name} thumbnail ${i + 1}" loading="lazy" decoding="async" onerror="handleImgError(this)" />
     </button>
   `).join('');
 }
@@ -413,6 +433,7 @@ document.addEventListener('keydown', (e) => {
     closeProductModal();
     closeCheckoutModal();
     closeOrdersModal();
+    closeWishlistModal();
   }
 });
 
@@ -679,6 +700,131 @@ function renderOrderHistory() {
 
 document.getElementById('ordersBtn').addEventListener('click', openOrdersModal);
 
+/* ── WISHLIST ── */
+const WISHLIST_KEY = 'arkpeanuts_wishlist';
+
+function loadWishlist() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(WISHLIST_KEY));
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    return [];
+  }
+}
+function persistWishlist() {
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+}
+
+let wishlist = loadWishlist(); // array of product ids
+
+function isWishlisted(productId) {
+  return wishlist.includes(productId);
+}
+
+function toggleWishlist(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  if (isWishlisted(productId)) {
+    wishlist = wishlist.filter(id => id !== productId);
+    showToast(`Removed ${product.name} from wishlist`);
+  } else {
+    wishlist.push(productId);
+    showToast(`${product.name} added to wishlist ♥`);
+  }
+  persistWishlist();
+  updateWishlistUI();
+}
+
+function updateWishlistUI() {
+  // Badge count in nav
+  const countEl = document.getElementById('wishlistCount');
+  if (countEl) countEl.textContent = wishlist.length;
+
+  // Re-render hearts on visible product cards without a full re-render
+  document.querySelectorAll('.product-card').forEach(card => {
+    const id = card.dataset.productId;
+    const heart = card.querySelector('.wishlist-heart-btn');
+    if (!heart) return;
+    const active = isWishlisted(id);
+    heart.classList.toggle('active', active);
+    heart.textContent = active ? '♥' : '♡';
+  });
+
+  // Update modal heart if the product modal is currently showing this product
+  const modalHeart = document.getElementById('modalWishlistBtn');
+  if (modalHeart && activeProduct) {
+    const active = isWishlisted(activeProduct.id);
+    modalHeart.classList.toggle('active', active);
+    modalHeart.textContent = active ? '♥' : '♡';
+  }
+
+  // Re-render the wishlist modal's list if it's open
+  if (document.getElementById('wishlistOverlay').classList.contains('open')) {
+    renderWishlistList();
+  }
+}
+
+function openWishlistModal() {
+  renderWishlistList();
+  document.getElementById('wishlistOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  a11yActivate(document.getElementById('wishlistModal'));
+}
+function closeWishlistModal() {
+  document.getElementById('wishlistOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (a11yActiveModal === document.getElementById('wishlistModal')) a11yDeactivate();
+}
+
+function renderWishlistList() {
+  const listEl = document.getElementById('wishlistList');
+  const emptyEl = document.getElementById('wishlistEmpty');
+  const items = wishlist.map(id => products.find(p => p.id === id)).filter(Boolean);
+
+  if (items.length === 0) {
+    listEl.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    return;
+  }
+  listEl.style.display = 'flex';
+  emptyEl.style.display = 'none';
+
+  listEl.innerHTML = items.map(p => `
+    <div class="order-card wishlist-item-card">
+      <img class="wishlist-item-img" src="${p.image}" alt="${p.name}" loading="lazy" decoding="async" onerror="handleImgError(this)" />
+      <div class="wishlist-item-info">
+        <strong>${p.name}</strong>
+        <span class="stars-sm">${renderStars(p.rating)} <span class="rating-count-sm">(${p.reviewCount})</span></span>
+        <span class="order-card-total">KSh ${p.variants[0].price.toLocaleString()}</span>
+      </div>
+      <div class="wishlist-item-actions">
+        <button class="btn-primary wishlist-move-btn" onclick="moveWishlistItemToCart('${p.id}')">Move to Cart</button>
+        <button class="remove-item" onclick="toggleWishlist('${p.id}')">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function moveWishlistItemToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  const variant = product.variants[0];
+  const existing = cart.find(i => i.name === `${product.name} - ${variant.label}`);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ name: `${product.name} - ${variant.label}`, price: variant.price, qty: 1 });
+  }
+  updateCart();
+  wishlist = wishlist.filter(id => id !== productId);
+  persistWishlist();
+  updateWishlistUI();
+  showToast(`${product.name} moved to cart!`);
+}
+
+document.getElementById('wishlistBtn').addEventListener('click', openWishlistModal);
+
 /* ── CART PERSISTENCE ── */
 const CART_KEY = 'arkpeanuts_cart';
 
@@ -740,6 +886,7 @@ function injectProductStructuredData() {
 
 renderCategoryCards();
 renderProductCards();
+document.getElementById('wishlistCount').textContent = wishlist.length;
 injectProductStructuredData();
 updateCart(); // reflect any cart restored from a previous visit
 
