@@ -438,8 +438,8 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ── CHECKOUT ── */
-const DELIVERY_FEES = { nairobi: 200, major: 400, upcountry: 600 };
-const FREE_DELIVERY_THRESHOLD = 3000; // Nairobi only, per shipping policy
+const DELIVERY_FEES = { ngong: 100, nairobi: 250, major: 400, upcountry: 600 };
+const FREE_DELIVERY_THRESHOLD = 3000; // Home zone (Ngong Town) only, per shipping policy
 
 function openCheckoutModal() {
   if (cart.length === 0) {
@@ -463,8 +463,8 @@ function closeCheckoutModal() {
 
 function calcDeliveryFee(subtotal) {
   const city = document.getElementById('checkoutCity').value;
-  if (city === 'nairobi' && subtotal >= FREE_DELIVERY_THRESHOLD) return 0;
-  return DELIVERY_FEES[city] ?? DELIVERY_FEES.nairobi;
+  if (city === 'ngong' && subtotal >= FREE_DELIVERY_THRESHOLD) return 0;
+  return DELIVERY_FEES[city] ?? DELIVERY_FEES.ngong;
 }
 
 function renderCheckoutSummary() {
@@ -496,7 +496,7 @@ function setPaymentMethod(input) {
   const hints = {
     mpesa: 'You\'ll receive an M-Pesa prompt once your order is confirmed.',
     card: 'You\'ll be redirected to a secure card payment page after placing your order.',
-    cod: 'Pay in cash when your order arrives. Available within Nairobi only.'
+    cod: 'Pay in cash when your order arrives. Available within Ngong Town and Nairobi only.'
   };
   document.getElementById('paymentHint').textContent = hints[input.value] || '';
 }
@@ -591,8 +591,8 @@ function submitCheckout(e) {
 
 /* ── ORDER HISTORY / TRACKING ── */
 const ORDERS_KEY = 'arkpeanuts_orders';
-const CITY_DELIVERY_DAYS = { nairobi: 1, major: 3, upcountry: 5 };
-const CITY_LABELS = { nairobi: 'Nairobi', major: 'Major Town', upcountry: 'Upcountry / Rural' };
+const CITY_DELIVERY_DAYS = { ngong: 1, nairobi: 1, major: 3, upcountry: 5 };
+const CITY_LABELS = { ngong: 'Ngong Town', nairobi: 'Nairobi', major: 'Major Town', upcountry: 'Upcountry / Rural' };
 const PAYMENT_LABELS = { mpesa: 'M-Pesa', card: 'Card', cod: 'Cash on Delivery' };
 
 function getOrders() {
@@ -611,7 +611,7 @@ function saveOrder(order) {
 /* Realistic, time-based status: no backend, so we derive progress from how
    long ago the order was placed vs. the delivery estimate for its area. */
 function computeOrderStatus(order) {
-  const days = CITY_DELIVERY_DAYS[order.city] || CITY_DELIVERY_DAYS.nairobi;
+  const days = CITY_DELIVERY_DAYS[order.city] || CITY_DELIVERY_DAYS.ngong;
   const totalMs = days * 24 * 60 * 60 * 1000;
   const elapsed = Date.now() - order.timestamp;
 
